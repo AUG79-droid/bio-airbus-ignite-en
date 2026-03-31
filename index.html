@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BioLab Airbus | Biomimicry Innovation Workshop</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@700;800&display=swap');
+:root{
+  --bg:#071526; --bg2:#0c2343; --panel:#0e1d33; --panel2:#122742; --line:rgba(255,255,255,.10);
+  --text:#eaf3ff; --muted:#a6bdd9; --cyan:#79dbff; --green:#6ef4bb; --gold:#ffd786; --pink:#e6b4ff;
+  --shadow:0 28px 70px rgba(0,0,0,.30); --radius:28px;
+}
+*{box-sizing:border-box} html,body{margin:0;padding:0;font-family:Inter,Arial,sans-serif;background:
+  radial-gradient(circle at 12% 10%, rgba(121,219,255,.14), transparent 18%),
+  radial-gradient(circle at 85% 12%, rgba(110,244,187,.10), transparent 18%),
+  linear-gradient(180deg,#071526 0%,#091a30 45%,#06111f 100%);color:var(--text);min-height:100%}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:
+  linear-gradient(rgba(255,255,255,.016) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(255,255,255,.016) 1px, transparent 1px);background-size:34px 34px;opacity:.28}
+button{font:inherit}
+.topbar{position:sticky;top:12px;z-index:40;display:flex;justify-content:space-between;align-items:center;width:min(1380px,calc(100% - 28px));margin:14px auto 0;padding:18px 24px;border:1px solid var(--line);border-radius:24px;background:rgba(5,16,31,.76);backdrop-filter:blur(14px);box-shadow:0 14px 36px rgba(0,0,0,.22)}
+.brand{font-family:Manrope,Inter,sans-serif;font-weight:800;font-size:24px;letter-spacing:-.04em;color:#fff}
+.topnav{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;text-transform:uppercase;letter-spacing:.14em;font-weight:700;color:var(--muted)}
+.topnav span.active{color:#fff}
+#app{width:min(1380px,calc(100% - 28px));margin:20px auto 36px;position:relative;z-index:1}
+.card{background:linear-gradient(180deg,rgba(12,29,52,.88),rgba(8,20,38,.92));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{display:grid;grid-template-columns:1.02fr .98fr;gap:24px;padding:26px;overflow:hidden}
+.hero-left{padding:36px 18px 28px 20px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.06);font-size:11px;letter-spacing:.16em;font-weight:800;text-transform:uppercase;color:var(--cyan)}
+h1,h2,h3,h4{font-family:Manrope,Inter,sans-serif;letter-spacing:-.04em;margin:0}
+h1{font-size:78px;line-height:.9;margin:18px 0 18px;max-width:620px}
+.hero p{font-size:18px;line-height:1.8;color:rgba(234,243,255,.82);max-width:620px;margin:0}
+.accent{background:linear-gradient(135deg,var(--green),var(--cyan),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+.btn{border:0;border-radius:18px;padding:15px 22px;font-weight:800;cursor:pointer;transition:.18s ease;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn:hover{transform:translateY(-2px) scale(1.01)}
+.btn-primary{background:linear-gradient(135deg,var(--green),#9af6d0);color:#07283a;box-shadow:0 18px 34px rgba(110,244,187,.28)}
+.btn-secondary{background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.08));border:1px solid rgba(255,255,255,.12);color:#fff}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:30px}
+.stat{padding:18px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08)}
+.stat strong{display:block;font-family:Manrope,Inter,sans-serif;font-size:32px;color:#fff}
+.stat span{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:rgba(234,243,255,.65);font-weight:700}
+.hero-right{display:grid;grid-template-columns:1.08fr .92fr;gap:18px;align-items:stretch;min-height:640px}
+.stage{position:relative;border-radius:30px;overflow:hidden;border:1px solid rgba(255,255,255,.10);background:
+  radial-gradient(circle at 72% 18%, rgba(255,215,134,.22), transparent 16%),
+  radial-gradient(circle at 30% 75%, rgba(121,219,255,.18), transparent 18%),
+  repeating-linear-gradient(90deg, rgba(21,85,66,.55) 0 14px, rgba(18,54,45,.46) 14px 28px),
+  linear-gradient(180deg,#10335f 0%,#0a1e38 50%,#0a1730 100%);box-shadow:0 24px 54px rgba(0,0,0,.28)}
+.stage .tag{position:absolute;top:20px;left:20px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.14);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.stage-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:250px;height:250px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.stage-core::before,.stage-core::after{content:'';position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.16)}
+.stage-core::before{inset:0;box-shadow:0 0 24px rgba(121,219,255,.24)}
+.stage-core::after{inset:28px}
+.glyph{width:116px;height:116px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:46px;background:radial-gradient(circle at 35% 32%, rgba(255,255,255,.80), rgba(121,219,255,.52) 34%, rgba(12,58,102,.56) 70%, rgba(255,255,255,.08) 100%);box-shadow:0 0 32px rgba(121,219,255,.34), inset 0 0 20px rgba(255,255,255,.16)}
+.stage-copy{position:absolute;left:24px;right:24px;bottom:22px}
+.stage-copy h3{font-size:34px;line-height:.96;margin-bottom:10px}
+.stage-copy p{margin:0;color:rgba(255,255,255,.82);line-height:1.65}
+.stack{display:grid;grid-template-rows:1fr 1fr;gap:18px}
+.mini{padding:24px;border-radius:28px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06));display:flex;flex-direction:column;justify-content:flex-end;min-height:220px}
+.mini .icon{width:54px;height:54px;border-radius:18px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px}
+.mini h4{font-size:28px;margin-bottom:8px}
+.mini p{margin:0;color:rgba(255,255,255,.76);line-height:1.65}
+.section{margin-top:24px;padding:28px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}
+.section-head p{margin:8px 0 0;color:var(--muted);line-height:1.7;max-width:760px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.panel{padding:24px;border-radius:24px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04))}
+.challenges{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.challenge{padding:18px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);cursor:pointer;transition:.16s}
+.challenge:hover,.challenge.active{transform:translateY(-3px);border-color:rgba(121,219,255,.38);box-shadow:0 18px 28px rgba(0,0,0,.18)}
+.challenge small,.strategy small,.vote small{display:block;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.challenge strong{display:block;font-size:18px;line-height:1.35;margin-bottom:10px}
+.challenge p{margin:0;color:rgba(234,243,255,.76);line-height:1.6;font-size:14px}
+.wheel{height:100%;min-height:330px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;background:
+  radial-gradient(circle at center, rgba(121,219,255,.12), transparent 34%),
+  linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));}
+.wheel-ring{width:230px;height:230px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.16);position:relative;box-shadow:0 0 28px rgba(121,219,255,.16)}
+.wheel-ring::before{content:'';position:absolute;inset:22px;border-radius:50%;border:1px dashed rgba(255,255,255,.16)}
+.wheel-core{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 35%, rgba(255,255,255,.78), rgba(255,215,134,.48) 34%, rgba(18,64,99,.65) 72%);box-shadow:0 0 28px rgba(255,215,134,.20)}
+#selectedChallengeTitle{font-size:28px;text-align:center}
+#selectedChallengeText{text-align:center;max-width:400px;color:var(--muted)}
+.library{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.strategy{padding:18px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);cursor:pointer;transition:.16s}
+.strategy:hover,.strategy.active{border-color:rgba(110,244,187,.34);transform:translateY(-3px)}
+.strategy strong{display:block;font-size:18px;line-height:1.35;margin-bottom:8px}
+.strategy p{margin:0;color:rgba(234,243,255,.76);line-height:1.6;font-size:14px}
+.canvas-wrap{display:grid;grid-template-columns:1.08fr .92fr;gap:18px}
+.canvas-area{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.input-card{padding:18px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.input-card label{display:block;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.input-card textarea,.input-card input{width:100%;border:1px solid rgba(255,255,255,.10);background:rgba(5,16,31,.42);color:var(--text);border-radius:16px;padding:14px 14px;min-height:110px;resize:vertical;font:inherit;line-height:1.5}
+.input-card input{min-height:unset}
+.preview{padding:24px;border-radius:24px;background:
+  radial-gradient(circle at 82% 14%, rgba(230,180,255,.16), transparent 18%),
+  linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.08)}
+.preview h3{font-size:34px;margin-bottom:14px}
+.preview-grid{display:grid;gap:12px}
+.preview-box{padding:16px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06)}
+.preview-box small{display:block;color:var(--muted);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;margin-bottom:8px}
+.preview-box p{margin:0;color:rgba(234,243,255,.86);line-height:1.6}
+.votes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.vote{padding:20px;border-radius:22px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04))}
+.vote h4{font-size:22px;margin-bottom:10px}
+.vote p{margin:0 0 14px;color:var(--muted);line-height:1.6}
+.vote button{width:100%}
+.vote-score{margin-top:14px;font-size:14px;color:#fff;font-weight:700}
+.footer-note{margin-top:18px;color:var(--muted);font-size:14px;line-height:1.7}
+.toast{position:fixed;right:24px;bottom:24px;background:rgba(7,18,31,.94);color:#fff;padding:14px 18px;border-radius:16px;border:1px solid rgba(255,255,255,.12);box-shadow:0 18px 30px rgba(0,0,0,.22);opacity:0;transform:translateY(10px);pointer-events:none;transition:.18s;z-index:100}
+.toast.show{opacity:1;transform:translateY(0)}
+@media (max-width:1100px){
+  .hero,.grid-2,.canvas-wrap,.library,.votes,.challenges,.canvas-area{grid-template-columns:1fr}
+  .hero-right{grid-template-columns:1fr;min-height:auto}
+  h1{font-size:54px}.stats{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:720px){
+  .topbar{width:calc(100% - 16px);padding:14px 16px}.topnav{gap:10px;font-size:10px}#app{width:calc(100% - 16px)}
+  h1{font-size:46px}.section{padding:20px}.hero{padding:18px}.hero-left{padding:22px 8px 18px 10px}.stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">BioLab Airbus</div>
+  <nav class="topnav">
+    <span class="active">Biomimicry</span>
+    <span>Airbus challenges</span>
+    <span>Nature strategies</span>
+    <span>Canvas</span>
+    <span>Pitch & vote</span>
+  </nav>
+</header>
+<main id="app">
+  <section class="hero card">
+    <div class="hero-left">
+      <div class="eyebrow">Premium innovation workshop</div>
+      <h1>Turn <span class="accent">nature’s strategies</span> into Airbus ideas.</h1>
+      <p>BioLab Airbus is a guided biomimicry experience for teams who want to connect biological intelligence with real industrial, operations and maintenance challenges. Explore a challenge, learn from nature, build a concept and prepare a final pitch.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('challengeSection').scrollIntoView({behavior:'smooth'})">Start the session</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('canvasSection').scrollIntoView({behavior:'smooth'})">Open biomimetic canvas</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><strong>4</strong><span>workshop stages</span></div>
+        <div class="stat"><strong>6</strong><span>Airbus challenge cards</span></div>
+        <div class="stat"><strong>6</strong><span>nature strategies</span></div>
+        <div class="stat"><strong>3</strong><span>sample pitches to vote</span></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="stage">
+        <span class="tag">Session flow</span>
+        <div class="stage-core"><div class="glyph">✦</div></div>
+        <div class="stage-copy">
+          <h3>Challenge → Biology → Concept → Pitch</h3>
+          <p>Move from inspiration to a defendable proposal with a clear problem, a biological model, a translation principle and an industrial application.</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="mini">
+          <div class="icon">🧬</div>
+          <h4>Nature as mentor</h4>
+          <p>Look for functions, patterns and mechanisms already solved by organisms and ecosystems.</p>
+        </div>
+        <div class="mini">
+          <div class="icon">🛠️</div>
+          <h4>Applicable ideas</h4>
+          <p>Filter inspiration through feasibility, operational value, sustainability impact and stakeholder usefulness.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section card" id="challengeSection">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Stage 1</div>
+        <h2>Select or spin an Airbus challenge</h2>
+        <p>Choose one challenge card to anchor the session. The app includes sample challenges linked to manufacturing, maintenance, logistics and infrastructure performance.</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="challenges" id="challengeGrid"></div>
+      </div>
+      <div class="panel wheel">
+        <div class="wheel-ring"><div class="wheel-core">🌀</div></div>
+        <button class="btn btn-primary" id="spinBtn">Spin challenge</button>
+        <h3 id="selectedChallengeTitle">Choose a challenge</h3>
+        <p id="selectedChallengeText">Select a challenge card on the left or spin the challenge selector.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section card">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Stage 2</div>
+        <h2>Explore nature strategies</h2>
+        <p>Use biological models as inspiration. Each strategy is expressed as a function, not as decoration. The goal is to ask: what does nature do here, and how could that become a design principle?</p>
+      </div>
+    </div>
+    <div class="library" id="strategyGrid"></div>
+  </section>
+
+  <section class="section card" id="canvasSection">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Stage 3</div>
+        <h2>Build your biomimetic canvas</h2>
+        <p>Capture the problem, the biological analogue, the design principle and the Airbus application. The right-hand panel updates live and turns your notes into a pitch-ready concept.</p>
+      </div>
+      <button class="btn btn-secondary" id="fillExampleBtn">Load example</button>
+    </div>
+    <div class="canvas-wrap">
+      <div class="canvas-area">
+        <div class="input-card">
+          <label for="teamName">Team name</label>
+          <input id="teamName" placeholder="Example: Green Wing Team" />
+        </div>
+        <div class="input-card">
+          <label for="ideaName">Concept title</label>
+          <input id="ideaName" placeholder="Example: Adaptive low-glare inspection lighting" />
+        </div>
+        <div class="input-card">
+          <label for="problem">1. Airbus challenge</label>
+          <textarea id="problem" placeholder="What problem are you trying to solve?"></textarea>
+        </div>
+        <div class="input-card">
+          <label for="biology">2. Biological model</label>
+          <textarea id="biology" placeholder="Which organism, ecosystem or natural behaviour inspires the idea?"></textarea>
+        </div>
+        <div class="input-card">
+          <label for="principle">3. Design principle</label>
+          <textarea id="principle" placeholder="Translate the biology into an engineering principle."></textarea>
+        </div>
+        <div class="input-card">
+          <label for="application">4. Airbus application</label>
+          <textarea id="application" placeholder="Where and how would this apply in Airbus?"></textarea>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="eyebrow">Live concept preview</div>
+        <h3 id="previewTitle">Your concept will appear here</h3>
+        <div class="preview-grid">
+          <div class="preview-box"><small>Team</small><p id="previewTeam">—</p></div>
+          <div class="preview-box"><small>Challenge</small><p id="previewProblem">—</p></div>
+          <div class="preview-box"><small>Biological inspiration</small><p id="previewBiology">—</p></div>
+          <div class="preview-box"><small>Design principle</small><p id="previewPrinciple">—</p></div>
+          <div class="preview-box"><small>Airbus application</small><p id="previewApplication">—</p></div>
+        </div>
+        <p class="footer-note">Tip: keep the concept concrete, functional and defendable. A strong pitch explains why the biological strategy is relevant, what changes operationally, and what value it creates.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section card">
+    <div class="section-head">
+      <div>
+        <div class="eyebrow">Stage 4</div>
+        <h2>Pitch and vote</h2>
+        <p>The workshop can end with a simple internal vote. Below are sample pitch cards you can use as placeholders or inspiration for a live voting dynamic.</p>
+      </div>
+    </div>
+    <div class="votes" id="voteGrid"></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const challenges = [
+  {title:'Reduce inspection lighting impact', area:'Operations', text:'How might Airbus reduce night-time lighting disturbance while preserving safety, visibility and maintenance quality?'},
+  {title:'Design heat-smart outdoor work zones', area:'Infrastructure', text:'How might exposed operational areas manage heat better and support comfort with less energy demand?'},
+  {title:'Improve fluid distribution efficiency', area:'Manufacturing', text:'How might cooling, cleaning or fluid systems distribute resources more precisely with lower waste?'},
+  {title:'Create quieter technical enclosures', area:'Maintenance', text:'How might equipment housings or work cells reduce acoustic stress for people and nearby fauna?'},
+  {title:'Make logistics flows more adaptive', area:'Industrial logistics', text:'How might internal routing become more resilient, modular and self-adjusting under changing demand?'},
+  {title:'Prevent surface fouling and dirt buildup', area:'Facilities', text:'How might surfaces stay cleaner for longer and require less aggressive maintenance or chemicals?'}
+];
+const strategies = [
+  {name:'Lotus leaf effect', type:'Surface strategy', text:'Micro-structured surfaces repel water and dirt, keeping interfaces cleaner with less intervention.'},
+  {name:'Termite mound ventilation', type:'Passive regulation', text:'Distributed openings and thermal gradients help regulate temperature and airflow without heavy active systems.'},
+  {name:'Owl feather acoustics', type:'Noise control', text:'Layered soft serrations reduce turbulence and diffuse sound, helping lower acoustic signatures.'},
+  {name:'Bee swarm coordination', type:'Distributed intelligence', text:'Simple local rules create coordinated, adaptive movement without central overcontrol.'},
+  {name:'Cactus water management', type:'Resource efficiency', text:'Geometry and microchannels capture, direct and conserve scarce resources efficiently.'},
+  {name:'Mangrove root resilience', type:'Structural filtering', text:'Branching, flexible systems stabilise flows, filter particles and absorb disturbance.'}
+];
+const samplePitches = [
+  {title:'Adaptive low-glare lighting skin', text:'Biomimicry-inspired luminaire shielding based on firefly and owl strategies to reduce overspill while preserving task visibility.', votes:0},
+  {title:'Passive comfort canopy', text:'A termite mound-informed canopy concept for outdoor technical areas that combines shade, airflow and lower radiant heat.', votes:0},
+  {title:'Self-cleaning workstation surfaces', text:'A lotus-inspired coating and texture package for selected work surfaces to cut dirt adhesion and harsh cleaning frequency.', votes:0}
+];
+let selectedChallenge = null;
+let selectedStrategy = null;
+const challengeGrid = document.getElementById('challengeGrid');
+const strategyGrid = document.getElementById('strategyGrid');
+const voteGrid = document.getElementById('voteGrid');
+const selectedChallengeTitle = document.getElementById('selectedChallengeTitle');
+const selectedChallengeText = document.getElementById('selectedChallengeText');
+const toast = document.getElementById('toast');
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>toast.classList.remove('show'), 1800);
+}
+
+function renderChallenges(){
+  challengeGrid.innerHTML = '';
+  challenges.forEach((item, idx) => {
+    const el = document.createElement('button');
+    el.className = 'challenge btn-ghost';
+    el.innerHTML = `<small>${item.area}</small><strong>${item.title}</strong><p>${item.text}</p>`;
+    el.addEventListener('click', ()=>selectChallenge(idx));
+    challengeGrid.appendChild(el);
+  });
+}
+function selectChallenge(idx){
+  selectedChallenge = challenges[idx];
+  [...challengeGrid.children].forEach((el,i)=>el.classList.toggle('active', i===idx));
+  selectedChallengeTitle.textContent = selectedChallenge.title;
+  selectedChallengeText.textContent = selectedChallenge.text;
+  document.getElementById('problem').value = selectedChallenge.text;
+  syncPreview();
+  showToast('Challenge selected');
+}
+
+document.getElementById('spinBtn').addEventListener('click', ()=>{
+  const idx = Math.floor(Math.random()*challenges.length);
+  selectChallenge(idx);
+  showToast('Challenge spun');
+});
+
+function renderStrategies(){
+  strategyGrid.innerHTML = '';
+  strategies.forEach((item, idx) => {
+    const el = document.createElement('button');
+    el.className = 'strategy btn-ghost';
+    el.innerHTML = `<small>${item.type}</small><strong>${item.name}</strong><p>${item.text}</p>`;
+    el.addEventListener('click', ()=>selectStrategy(idx));
+    strategyGrid.appendChild(el);
+  });
+}
+function selectStrategy(idx){
+  selectedStrategy = strategies[idx];
+  [...strategyGrid.children].forEach((el,i)=>el.classList.toggle('active', i===idx));
+  document.getElementById('biology').value = selectedStrategy.name + '. ' + selectedStrategy.text;
+  document.getElementById('principle').value = buildPrinciple(selectedStrategy.name);
+  syncPreview();
+  showToast('Nature strategy added');
+}
+function buildPrinciple(name){
+  const map = {
+    'Lotus leaf effect':'Use surface texture and material behaviour to reduce adhesion, simplify maintenance and lower cleaning inputs.',
+    'Termite mound ventilation':'Use form, airflow paths and passive thermal gradients to regulate conditions with less active energy use.',
+    'Owl feather acoustics':'Use layered edges and sound-softening geometries to reduce turbulence noise and diffuse acoustic peaks.',
+    'Bee swarm coordination':'Use distributed decision rules and modular signals so local actors self-adjust without central overload.',
+    'Cactus water management':'Use geometry to capture, channel and conserve resources exactly where they are needed.',
+    'Mangrove root resilience':'Use branching flexible structures to filter flows, absorb shocks and stabilise changing conditions.'
+  };
+  return map[name] || 'Translate the biological function into an applicable engineering rule.';
+}
+
+function renderVotes(){
+  voteGrid.innerHTML='';
+  samplePitches.forEach((item, idx)=>{
+    const el = document.createElement('div');
+    el.className='vote';
+    el.innerHTML = `<small>Sample pitch</small><h4>${item.title}</h4><p>${item.text}</p><button class="btn btn-primary">Vote for this idea</button><div class="vote-score">Votes: <span>${item.votes}</span></div>`;
+    el.querySelector('button').addEventListener('click', ()=>{
+      item.votes += 1;
+      renderVotes();
+      showToast('Vote registered');
+    });
+    voteGrid.appendChild(el);
+  });
+}
+
+const inputIds = ['teamName','ideaName','problem','biology','principle','application'];
+inputIds.forEach(id=>document.getElementById(id).addEventListener('input', syncPreview));
+function syncPreview(){
+  document.getElementById('previewTeam').textContent = document.getElementById('teamName').value || '—';
+  document.getElementById('previewTitle').textContent = document.getElementById('ideaName').value || 'Your concept will appear here';
+  document.getElementById('previewProblem').textContent = document.getElementById('problem').value || '—';
+  document.getElementById('previewBiology').textContent = document.getElementById('biology').value || '—';
+  document.getElementById('previewPrinciple').textContent = document.getElementById('principle').value || '—';
+  document.getElementById('previewApplication').textContent = document.getElementById('application').value || '—';
+}
+
+document.getElementById('fillExampleBtn').addEventListener('click', ()=>{
+  document.getElementById('teamName').value = 'Blue Biomimic Team';
+  document.getElementById('ideaName').value = 'Adaptive low-glare inspection lighting';
+  document.getElementById('problem').value = 'How might Airbus reduce night-time lighting disturbance while preserving safety, visibility and maintenance quality?';
+  document.getElementById('biology').value = 'Owl feather acoustics. Layered soft serrations reduce turbulence and diffuse sound; the same logic can inspire light control geometries that soften sharp spill and reduce disturbance.';
+  document.getElementById('principle').value = 'Use layered, directional shielding geometries to control emission precisely, reducing overspill while maintaining task-focused performance.';
+  document.getElementById('application').value = 'Apply the concept to selected outdoor inspection points and maintenance areas using modular luminaire accessories and pilot measurement of glare, overspill and user acceptance.';
+  syncPreview();
+  showToast('Example loaded');
+});
+
+renderChallenges();
+renderStrategies();
+renderVotes();
+syncPreview();
+</script>
+</body>
+</html>
