@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 16% 96%;
+    --foreground: 220 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 10%;
+
+    --primary: 215 80% 22%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 18% 93%;
+    --secondary-foreground: 215 60% 20%;
+
+    --muted: 210 14% 93%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 45 95% 52%;
+    --accent-foreground: 30 60% 12%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 20% 90%;
+    --input: 215 20% 90%;
+    --ring: 215 80% 22%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 215 40% 8%;
+    --sidebar-foreground: 210 10% 90%;
+    --sidebar-primary: 45 95% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 30% 15%;
+    --sidebar-accent-foreground: 210 10% 90%;
+    --sidebar-border: 215 25% 18%;
+    --sidebar-ring: 45 95% 52%;
+
+    /* Semantic tokens */
+    --surface-dark: 215 40% 8%;
+    --surface-dark-foreground: 210 15% 92%;
+    --surface-elevated: 0 0% 100%;
+    --success: 160 65% 38%;
+    --success-foreground: 0 0% 100%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(170deg, hsl(215 45% 6%) 0%, hsl(215 55% 12%) 40%, hsl(200 40% 16%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(215 80% 22%), hsl(200 70% 32%));
+    --gradient-accent: linear-gradient(135deg, hsl(45 95% 52%), hsl(38 90% 48%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(215 15% 98%) 100%);
+    --gradient-surface: linear-gradient(135deg, hsl(215 40% 8%), hsl(215 50% 14%));
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px 0 hsl(215 30% 20% / 0.06), 0 1px 2px -1px hsl(215 30% 20% / 0.06);
+    --shadow-md: 0 4px 16px -2px hsl(215 30% 20% / 0.08), 0 2px 6px -2px hsl(215 30% 20% / 0.04);
+    --shadow-lg: 0 12px 40px -8px hsl(215 30% 20% / 0.12), 0 4px 12px -4px hsl(215 30% 20% / 0.06);
+    --shadow-accent: 0 4px 20px -4px hsl(45 95% 52% / 0.3);
+
+    /* Typography */
+    --font-display: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  .dark {
+    --background: 220 20% 6%;
+    --foreground: 210 15% 92%;
+    --card: 220 18% 10%;
+    --card-foreground: 210 15% 92%;
+    --primary: 210 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 20% 16%;
+    --secondary-foreground: 210 15% 92%;
+    --muted: 215 18% 14%;
+    --muted-foreground: 215 12% 55%;
+    --accent: 45 95% 55%;
+    --accent-foreground: 30 60% 12%;
+    --border: 215 18% 18%;
+    --input: 215 18% 18%;
+    --ring: 210 70% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Layout */
+  .biolab-container {
+    @apply max-w-6xl mx-auto px-6 lg:px-8;
+  }
+
+  /* Dark hero surface */
+  .biolab-hero {
+    background: var(--gradient-hero);
+    color: hsl(var(--surface-dark-foreground));
+  }
+
+  .biolab-hero-overlay {
+    background: linear-gradient(
+      170deg,
+      hsl(215 45% 6% / 0.92) 0%,
+      hsl(215 50% 10% / 0.82) 50%,
+      hsl(200 40% 14% / 0.88) 100%
+    );
+  }
+
+  /* Cards */
+  .biolab-card {
+    @apply bg-card rounded-xl border border-border p-6 relative;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .biolab-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .biolab-card-interactive {
+    @apply biolab-card cursor-pointer;
+  }
+
+  .biolab-card-interactive:hover {
+    @apply border-primary/30;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .biolab-card-dark {
+    @apply rounded-xl border p-6;
+    background: var(--gradient-surface);
+    border-color: hsl(215 30% 20%);
+    color: hsl(var(--surface-dark-foreground));
+  }
+
+  /* Buttons */
+  .biolab-btn-primary {
+    @apply inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl font-semibold text-base transition-all;
+    background: var(--gradient-primary);
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 2px 12px -2px hsl(215 80% 22% / 0.35);
+    letter-spacing: 0.01em;
+  }
+
+  .biolab-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px -4px hsl(215 80% 22% / 0.45);
+  }
+
+  .biolab-btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .biolab-btn-accent {
+    @apply inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl font-semibold text-base transition-all;
+    background: var(--gradient-accent);
+    color: hsl(var(--accent-foreground));
+    box-shadow: var(--shadow-accent);
+    letter-spacing: 0.01em;
+  }
+
+  .biolab-btn-accent:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 28px -4px hsl(45 95% 52% / 0.4);
+  }
+
+  .biolab-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium text-base transition-all;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .biolab-btn-ghost:hover {
+    color: hsl(var(--foreground));
+    background: hsl(var(--muted) / 0.6);
+  }
+
+  /* Section headers */
+  .biolab-section-title {
+    @apply text-3xl md:text-4xl font-bold tracking-tight;
+    font-family: var(--font-display);
+    color: hsl(var(--foreground));
+  }
+
+  .biolab-subtitle {
+    @apply text-lg font-normal;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.6;
+  }
+
+  /* Phase indicator */
+  .biolab-phase {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-mono font-medium uppercase tracking-widest;
+    background: hsl(var(--primary) / 0.08);
+    color: hsl(var(--primary));
+    border: 1px solid hsl(var(--primary) / 0.15);
+    letter-spacing: 0.12em;
+  }
+
+  /* Badge */
+  .biolab-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium;
+    background: hsl(var(--accent) / 0.12);
+    color: hsl(38 70% 38%);
+    border: 1px solid hsl(var(--accent) / 0.2);
+    font-family: var(--font-mono);
+  }
+
+  /* Mono label */
+  .biolab-label {
+    @apply text-xs font-medium uppercase tracking-wider;
+    font-family: var(--font-mono);
+    color: hsl(var(--muted-foreground));
+    letter-spacing: 0.1em;
+  }
+
+  /* Input field */
+  .biolab-input {
+    @apply w-full border border-border rounded-xl px-4 py-3 text-foreground transition-all;
+    background: hsl(var(--muted) / 0.3);
+    font-family: var(--font-body);
+  }
+
+  .biolab-input::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .biolab-input:focus {
+    @apply outline-none ring-2 ring-primary/30 border-primary/40;
+    background: hsl(var(--card));
+  }
+
+  /* Grid pattern overlay */
+  .biolab-grid-pattern {
+    background-image:
+      linear-gradient(hsl(215 30% 50% / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(215 30% 50% / 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .biolab-grid-pattern-dark {
+    background-image:
+      linear-gradient(hsl(210 30% 60% / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(210 30% 60% / 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Separator line */
+  .biolab-divider {
+    @apply w-full h-px;
+    background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+  }
+}
+
+@layer utilities {
+  .text-gradient-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .font-mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
