@@ -58,8 +58,8 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
 
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="font-display font-bold tracking-tight mb-6" style={{ color: "hsl(0, 0%, 98%)" }}>
-            <span className="block text-5xl md:text-7xl lg:text-8xl">BioLab</span>
-            <span className="block text-5xl md:text-7xl lg:text-8xl text-gradient-accent mt-1">Airbus</span>
+            <span className="block text-5xl md:text-7xl lg:text-8xl">Sustainable</span>
+            <span className="block text-5xl md:text-7xl lg:text-8xl text-gradient-accent mt-1">Innovation Lab</span>
           </h1>
 
           <motion.div
