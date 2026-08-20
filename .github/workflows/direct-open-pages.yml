@@ -35,7 +35,7 @@ jobs:
           rm -rf _site
           mkdir -p _site
           if [ -f package.json ]; then
-            if [ -f package-lock.json ]; then npm ci; else npm install; fi
+            npm install --no-audit --no-fund
             if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts.build?0:1)"; then
               if node -e "const p=require('./package.json'); process.exit((p.dependencies&&p.dependencies.vite)||(p.devDependencies&&p.devDependencies.vite)?0:1)"; then npm run build -- --base=./; else npm run build; fi
             fi
