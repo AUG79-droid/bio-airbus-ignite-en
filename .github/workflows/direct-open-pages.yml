@@ -37,7 +37,7 @@ jobs:
           if [ -f package.json ]; then
             npm install --no-audit --no-fund
             if node -e "const p=require('./package.json'); process.exit(p.scripts&&p.scripts.build?0:1)"; then
-              if node -e "const p=require('./package.json'); process.exit((p.dependencies&&p.dependencies.vite)||(p.devDependencies&&p.devDependencies.vite)?0:1)"; then npm run build -- --base=./; else npm run build; fi
+              npm run build
             fi
           fi
           if [ -d dist ]; then cp -a dist/. _site/; elif [ -d build ]; then cp -a build/. _site/; elif [ -d out ]; then cp -a out/. _site/; else rsync -a --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='_site' ./ _site/; fi
