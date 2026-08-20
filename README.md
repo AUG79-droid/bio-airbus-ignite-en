@@ -1,6 +1,6 @@
 # Sustainable Innovation Lab — English edition
 
-An interactive, guided biomimicry workshop that helps teams turn Airbus challenges into nature-inspired innovation proposals.
+A sustainability-focused, guided biomimicry workshop that helps teams turn Airbus challenges into nature-inspired innovation proposals.
 
 ## Live application
 
