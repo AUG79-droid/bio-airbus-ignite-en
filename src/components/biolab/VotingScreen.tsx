@@ -46,7 +46,7 @@ export default function VotingScreen({ onNext, onBack }: VotingScreenProps) {
                     This is not the “right” idea. It is the proposal your team has built.
                   </h3>
                   <p className="text-base md:text-lg leading-8 text-slate-200/90 mb-5">
-                    BioLab Airbus is not about finding one single solution. It is about generating a <strong>coherent</strong>, <strong>defensible</strong> proposal with a <strong>reasonable next step</strong>.
+                    Sustainable Innovation Lab is not about finding one single solution. It is about generating a <strong>coherent</strong>, <strong>defensible</strong> proposal with a <strong>reasonable next step</strong>.
                   </p>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <span className="biolab-label block mb-2">Check this before you finish</span>
