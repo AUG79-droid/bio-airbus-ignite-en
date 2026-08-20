@@ -1,4 +1,4 @@
-# BioLab Airbus — English edition
+# Sustainable Innovation Lab — English edition
 
 An interactive, guided biomimicry workshop that helps teams turn Airbus challenges into nature-inspired innovation proposals.
 
