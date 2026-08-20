@@ -20,7 +20,7 @@ export default function BioLabNav() {
     >
       <div className="biolab-container flex items-center justify-between h-12">
         <div className="flex items-center gap-2">
-          <span className="font-display font-bold text-foreground text-sm">BioLab</span>
+          <span className="font-display font-bold text-foreground text-sm">Sustainable Innovation Lab</span>
           <span className="text-gradient-accent font-display font-bold text-sm">Airbus</span>
         </div>
 
