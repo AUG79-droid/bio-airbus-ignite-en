@@ -1,6 +1,29 @@
 import { motion } from "framer-motion";
 import { STEPS } from "@/data/biolab-data";
 
+const BIOMIMICRY_RULES = [
+  {
+    number: "A",
+    title: "Define the function",
+    text: "Frame what the design must achieve—reduce drag, distribute load or detect damage—before looking for an organism.",
+  },
+  {
+    number: "B",
+    title: "Abstract the mechanism",
+    text: "Describe how the biological system works without simply copying its visible shape or naming the animal.",
+  },
+  {
+    number: "C",
+    title: "Translate with constraints",
+    text: "Adapt the principle to aerospace realities such as safety, certification, mass, materials, maintenance and manufacturability.",
+  },
+  {
+    number: "D",
+    title: "Test before claiming impact",
+    text: "Treat the idea as a hypothesis. Define evidence, comparison criteria and a first validation step before claiming benefits.",
+  },
+];
+
 interface HowItWorksScreenProps {
   onNext: () => void;
   onBack: () => void;
@@ -40,10 +63,33 @@ export default function HowItWorksScreen({ onNext, onBack }: HowItWorksScreenPro
           ))}
         </div>
 
+        <motion.section initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto biolab-card-dark mb-8">
+          <div className="grid lg:grid-cols-[0.72fr_1.28fr] gap-7 items-start">
+            <div>
+              <span className="biolab-label block mb-3" style={{ color: "hsl(45, 95%, 65%)" }}>Essential theory</span>
+              <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-4">Four rules for credible biomimicry</h3>
+              <p className="text-sm md:text-base text-slate-300 leading-7">
+                A nature-inspired idea becomes useful only when the team explains the causal bridge between a biological strategy and a technical application.
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {BIOMIMICRY_RULES.map((rule) => (
+                <div key={rule.number} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="h-7 w-7 rounded-lg grid place-items-center bg-accent text-accent-foreground text-xs font-mono font-bold">{rule.number}</span>
+                    <h4 className="font-display font-semibold text-white">{rule.title}</h4>
+                  </div>
+                  <p className="text-sm text-slate-300 leading-6">{rule.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
         <div className="max-w-3xl mx-auto rounded-2xl border border-primary/15 bg-primary/5 p-5 mb-12">
           <h3 className="text-base font-semibold text-foreground mb-2">Expected outcome</h3>
           <p className="text-sm leading-7 text-muted-foreground">
-            By the end of the session, each team will have a <strong className="text-foreground">clearly defined Airbus challenge</strong>, a <strong className="text-foreground">selected natural model</strong>, an <strong className="text-foreground">identified biomimetic principle</strong> and an <strong className="text-foreground">applicable idea</strong> ready for a short pitch.
+            By the end of the session, each team will have a <strong className="text-foreground">clearly defined Airbus challenge</strong>, a <strong className="text-foreground">selected natural model</strong>, an <strong className="text-foreground">identified biomimetic principle</strong>, a <strong className="text-foreground">constrained application hypothesis</strong> and a <strong className="text-foreground">first validation step</strong> ready for review.
           </p>
         </div>
 

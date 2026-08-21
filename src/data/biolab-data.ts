@@ -212,7 +212,7 @@ export function createEmptyCanvas(): CanvasData {
 
 export function createTeam(name: string, colorIndex: number): TeamData {
   return {
-    id: `team-${Date.now()}`,
+    id: `team-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name,
     color: TEAM_COLORS[colorIndex % TEAM_COLORS.length].value,
     canvas: createEmptyCanvas(),

@@ -92,6 +92,7 @@ export default function BioCanvasScreen({ onNext, onBack }: BioCanvasScreenProps
   if (!activeTeam) return null;
 
   const completedFields = CANVAS_FIELDS.filter((f) => activeTeam.canvas[f.key].trim().length > 0).length;
+  const canContinue = completedFields === CANVAS_FIELDS.length;
   const challenge = activeTeam.challenge;
   const organism = activeTeam.organism;
   const examples = buildExamples(challenge, organism);
@@ -254,6 +255,23 @@ export default function BioCanvasScreen({ onNext, onBack }: BioCanvasScreenProps
           </div>
         </motion.div>
 
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto mb-8">
+          <div className="biolab-rubric">
+            <div>
+              <span className="biolab-label block mb-2">Quality gate</span>
+              <h3 className="text-lg font-display font-bold text-foreground">A credible concept should pass four checks</h3>
+            </div>
+            {[
+              ["Specific", "A bounded technical problem"],
+              ["Causal", "Mechanism explains the effect"],
+              ["Constrained", "Safety, mass and operations considered"],
+              ["Testable", "A measurable first experiment"],
+            ].map(([title, text]) => (
+              <div key={title} className="biolab-rubric-item"><strong>{title}</strong><span>{text}</span></div>
+            ))}
+          </div>
+        </motion.div>
+
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
           {CANVAS_FIELDS.map((field, i) => (
             <motion.div
@@ -292,10 +310,11 @@ export default function BioCanvasScreen({ onNext, onBack }: BioCanvasScreenProps
 
         <div className="flex justify-center gap-4 flex-wrap">
           <button onClick={onBack} className="biolab-btn-ghost">← Back to connection</button>
-          <button onClick={onNext} className="biolab-btn-primary">
+          <button onClick={onNext} className="biolab-btn-primary" disabled={!canContinue} title={!canContinue ? "Complete all six canvas blocks to continue" : undefined}>
             Go to step 6: prepare the pitch
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
           </button>
+          {!canContinue && <p className="w-full text-center text-xs text-muted-foreground">Complete the {CANVAS_FIELDS.length - completedFields} remaining canvas {CANVAS_FIELDS.length - completedFields === 1 ? "block" : "blocks"} to unlock the pitch.</p>}
         </div>
       </div>
     </div>

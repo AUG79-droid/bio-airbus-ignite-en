@@ -28,7 +28,7 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
           <div className="w-1.5 h-1.5 rounded-full bg-current" style={{ color: "hsl(45, 95%, 52%)" }} />
           <span className="font-mono-label" style={{ color: "hsl(210, 15%, 65%)" }}>Guided biomimicry workshop</span>
         </div>
-        <span className="font-mono-label" style={{ color: "hsl(210, 15%, 50%)" }}>Airbus Innovation Lab</span>
+        <span className="hidden sm:block font-mono-label" style={{ color: "hsl(210, 15%, 60%)" }}>Airbus-context learning simulation</span>
       </div>
 
       <motion.div
@@ -52,13 +52,13 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
             }}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-            Practical session for Airbus teams
+            Guided biomimicry design experience
           </span>
         </motion.div>
 
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="font-display font-bold tracking-tight mb-6" style={{ color: "hsl(0, 0%, 98%)" }}>
-            <span className="block text-5xl md:text-7xl lg:text-8xl">Sustainable</span>
+            <span className="block text-5xl md:text-7xl lg:text-8xl">Bio-Inspired</span>
             <span className="block text-5xl md:text-7xl lg:text-8xl text-gradient-accent mt-1">Innovation Lab</span>
           </h1>
 
@@ -75,7 +75,7 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
           </p>
 
           <p className="text-sm md:text-base mb-8 max-w-3xl mx-auto leading-relaxed" style={{ color: "hsl(210, 15%, 68%)" }}>
-            <strong className="text-white">This is not a quiz.</strong> It is a guided team exercise: receive an Airbus challenge, explore natural models, identify the biomimetic principle and translate it into a defensible proposal.
+            <strong className="text-white">This is not a quiz.</strong> It combines essential biomimicry theory with a guided team exercise: define a challenge, study biological strategies and translate one into a testable proposal.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
 
         <div className="text-center mb-12">
           <p className="text-sm max-w-2xl mx-auto mb-6" style={{ color: "hsl(210, 15%, 58%)" }}>
-            Biomimicry learns from nature to solve human challenges. In this session, we will use it to generate useful ideas for Airbus—not to memorise theory.
+            Biomimicry studies how living systems perform functions and translates those strategies into human design. You will move from function to biological mechanism, design principle, application and validation.
           </p>
 
           <motion.button
@@ -105,11 +105,17 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
             onClick={onNext}
             className="biolab-btn-accent text-lg px-14 py-5"
           >
-            See how it works and start
+            Enter the design studio
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </motion.button>
+        </div>
+
+        <div className="max-w-3xl mx-auto mb-9 rounded-2xl border border-white/15 bg-black/30 backdrop-blur-md px-5 py-4 text-center">
+          <p className="text-xs md:text-sm leading-6" style={{ color: "hsl(210, 15%, 74%)" }}>
+            <strong className="text-white">Learning-use notice:</strong> this independent educational simulation uses Airbus-relevant scenarios. It does not represent an official Airbus process, technical recommendation or environmental claim.
+          </p>
         </div>
 
         <motion.div

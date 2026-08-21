@@ -163,6 +163,35 @@ export default function MatchingScreen({ onNext, onBack }: MatchingScreenProps) 
               </div>
             </div>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18 }}
+            className="biolab-card"
+          >
+            <div className="flex flex-col lg:flex-row lg:items-center gap-5">
+              <div className="lg:max-w-xs">
+                <span className="biolab-label block mb-2">Learning capsule</span>
+                <h3 className="text-xl font-display font-bold text-foreground">Copy the logic, not the look</h3>
+              </div>
+              <div className="biolab-transfer-chain flex-1" aria-label="Biomimicry translation sequence">
+                {[
+                  ["1", "Function", "What must improve?"],
+                  ["2", "Biological strategy", "How does nature do it?"],
+                  ["3", "Design principle", "What logic is transferable?"],
+                  ["4", "Application", "Where and how could it work?"],
+                ].map(([number, title, text]) => (
+                  <div key={number} className="biolab-transfer-step">
+                    <span>{number}</span><div><strong>{title}</strong><small>{text}</small></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="mt-4 pt-4 border-t border-border text-sm text-muted-foreground leading-6">
+              A resemblance alone is not biomimicry. Your proposal should explain a causal mechanism and recognise that further engineering, lifecycle analysis and validation are still required.
+            </p>
+          </motion.div>
         </div>
 
         <div className="flex justify-center gap-4 mt-12">

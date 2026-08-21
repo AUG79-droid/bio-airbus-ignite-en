@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { Check, Clipboard, Printer, RotateCcw, ShieldCheck } from "lucide-react";
 import { useBioLab } from "@/contexts/BioLabContext";
 import type { TeamData } from "@/data/biolab-data";
 
@@ -7,261 +9,209 @@ interface ResultsScreenProps {
 }
 
 function hasText(value?: string) {
-  return Boolean(value && value.trim().length > 0);
+  return Boolean(value?.trim());
 }
 
-function makeTitle(team: TeamData) {
+function proposalTitle(team: TeamData) {
   if (hasText(team.pitchTitle)) return team.pitchTitle.trim();
-
-  const challenge = team.challenge?.title?.trim();
-  const organism = team.organism?.name?.trim();
-
-  if (challenge && organism) {
-    return `${challenge} inspired by ${organism.toLowerCase()}`;
-  }
-
-  if (challenge) return `Proposal for ${challenge.toLowerCase()}`;
-  if (organism) return `Idea inspired by ${organism.toLowerCase()}`;
-  return team.name || "Team proposal";
+  if (team.challenge && team.organism) return `${team.challenge.title} inspired by ${team.organism.name.toLowerCase()}`;
+  return `${team.name} concept`;
 }
 
-function fallbackText(value: string | undefined, fallback: string) {
-  return hasText(value) ? value!.trim() : fallback;
-}
-
-function completeness(team: TeamData) {
-  const fields = [
-    team.challenge?.title,
-    team.organism?.name,
-    team.organism?.principle,
-    team.canvas?.solution,
-    team.canvas?.benefit,
-    team.canvas?.implementation,
+function readinessChecks(team: TeamData) {
+  return [
+    {
+      label: "Problem defined",
+      text: "A specific aerospace need is stated.",
+      passed: hasText(team.canvas.problem) && Boolean(team.challenge),
+    },
+    {
+      label: "Mechanism abstracted",
+      text: "The biological strategy and principle are explicit.",
+      passed: Boolean(team.organism) && hasText(team.canvas.principle),
+    },
+    {
+      label: "Transfer specified",
+      text: "The principle becomes a concrete Airbus-context idea.",
+      passed: hasText(team.canvas.solution),
+    },
+    {
+      label: "Validation proposed",
+      text: "A first test or comparison is identified.",
+      passed: hasText(team.canvas.implementation),
+    },
   ];
+}
 
-  return fields.filter((f) => hasText(f)).length;
+function fallback(value: string | undefined, emptyText: string) {
+  return hasText(value) ? value!.trim() : emptyText;
 }
 
 export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
   const { teams } = useBioLab();
+  const [copied, setCopied] = useState(false);
   const sorted = [...teams].sort((a, b) => b.votes - a.votes);
   const totalVotes = sorted.reduce((sum, team) => sum + team.votes, 0);
-  const maxVotes = sorted[0]?.votes ?? 0;
-  const singleTeamMode = sorted.length <= 1;
-  const hasMeaningfulRanking = sorted.length > 1 && totalVotes > 0;
+  const competitive = sorted.length > 1 && totalVotes > 0;
   const topTeam = sorted[0];
 
   if (!topTeam) return null;
 
-  const topTitle = makeTitle(topTeam);
-  const topCompletion = completeness(topTeam);
+  const checks = readinessChecks(topTeam);
+  const readiness = checks.filter((check) => check.passed).length;
+  const title = proposalTitle(topTeam);
+  const summary = [
+    `BIO-INSPIRED INNOVATION LAB — CONCEPT SUMMARY`,
+    `Team: ${topTeam.name}`,
+    `Proposal: ${title}`,
+    `Challenge: ${fallback(topTeam.challenge?.title, "Not defined")}`,
+    `Natural model: ${fallback(topTeam.organism?.name, "Not selected")}`,
+    `Design principle: ${fallback(topTeam.organism?.principle, "Not defined")}`,
+    `Proposed solution: ${fallback(topTeam.canvas.solution, "Not defined")}`,
+    `Expected impact: ${fallback(topTeam.canvas.benefit, "Not defined")}`,
+    `First validation step: ${fallback(topTeam.canvas.implementation, "Not defined")}`,
+    `Design readiness: ${readiness}/4 checks`,
+    `Status: Workshop hypothesis — not a validated technical or environmental claim.`,
+  ].join("\n");
 
-  if (!hasMeaningfulRanking) {
-    return (
-      <div className="min-h-screen flex flex-col py-20 biolab-grid-pattern">
-        <div className="biolab-container">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <span className="biolab-phase mb-5 inline-flex">Phase 08 — Summary</span>
-            <h2 className="biolab-section-title mb-3">What this workshop has produced</h2>
-            <p className="biolab-subtitle max-w-3xl mx-auto">
-              {singleTeamMode
-                ? "As there was only one team, this screen does not show a winner. It shows the proposal you built during the session and its final level of maturity."
-                : "There are not yet enough votes to create a ranking. This is a summary of the proposal you generated and the areas worth strengthening before presenting it outside the workshop."}
-            </p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="max-w-6xl mx-auto mb-10">
-            <div className="biolab-card-dark px-8 py-8">
-              <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-8 items-start">
-                <div>
-                  <span className="biolab-label block mb-3" style={{ color: "hsl(45, 95%, 65%)" }}>
-                    How to read this summary
-                  </span>
-                  <h3 className="text-3xl md:text-4xl font-bold font-display text-white mb-4 leading-tight">
-                    It does not judge whether the idea is right. It shows what you have defined and what still needs to be clarified.
-                  </h3>
-                  <p className="text-base md:text-lg leading-8 text-slate-200/90 mb-6">
-                    In applied biomimicry, there is rarely a single valid answer. The real value lies in connecting the <strong>Airbus challenge</strong>, <strong>natural model</strong>, <strong>biomimetic principle</strong> and <strong>verifiable next step</strong> effectively.
-                  </p>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4 mb-4">
-                    <span className="biolab-label block mb-2">How to interpret it</span>
-                    <ul className="space-y-2 text-sm md:text-base text-slate-200/85 leading-7">
-                      <li>• If there was only one team, this is a <strong>session summary</strong>, not a ranking.</li>
-                      <li>• If no votes were cast, there is no “winner”; there is a <strong>proposal at its current level of maturity</strong>.</li>
-                      <li>• The next step is to decide whether it deserves a <strong>pilot</strong>, improvement or another iteration.</li>
-                    </ul>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <span className="biolab-label block mb-2">Level of progress achieved</span>
-                    <div className="flex items-center gap-4">
-                      <div className="flex gap-1.5">
-                        {[...Array(6)].map((_, i) => (
-                          <div key={i} className={`w-2.5 h-9 rounded-sm ${i < topCompletion ? "bg-success" : "bg-white/10"}`} />
-                        ))}
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold">{topCompletion}/6 well-defined blocks</p>
-                        <p className="text-sm text-slate-300">The closer it is to 6, the more ready the proposal is for presentation outside the workshop.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-                  <span className="biolab-label block mb-3">Resulting proposal</span>
-                  <h4 className="text-2xl font-display font-bold text-white mb-4">{topTitle}</h4>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Airbus challenge</span>
-                      <p className="text-slate-100 font-medium">{fallbackText(topTeam.challenge?.title, "Challenge still to be defined")}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Natural model</span>
-                      <p className="text-slate-100 font-medium">{fallbackText(topTeam.organism?.name, "Natural model still to be selected")}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Principle</span>
-                      <p className="text-slate-100 font-medium">{fallbackText(topTeam.organism?.principle, "Principle not yet translated")}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Status</span>
-                      <p className="text-slate-100 font-medium">{topCompletion >= 5 ? "Mature enough for review" : topCompletion >= 3 ? "A sound basis, but more work is needed" : "Still very preliminary"}</p>
-                    </div>
-                  </div>
-
-                  {topTeam.organism?.image && (
-                    <div className="rounded-2xl overflow-hidden border border-white/10 bg-white/5 mb-4">
-                      <img src={topTeam.organism.image} alt={topTeam.organism.name} className="w-full h-44 object-cover" referrerPolicy="no-referrer" />
-                    </div>
-                  )}
-
-                  <div className="space-y-3 text-sm">
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Proposed solution</span>
-                      <p className="text-slate-200/85 leading-7">{fallbackText(topTeam.canvas.solution, "You have not yet finalised a solution. The workshop logic is in place, but the technical proposal should be made more concrete.")}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Expected impact</span>
-                      <p className="text-slate-200/85 leading-7">{fallbackText(topTeam.canvas.benefit, "The expected impact has not yet been quantified. The next step would be to estimate the operational, technical or environmental improvement it could deliver.")}</p>
-                    </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                      <span className="biolab-label block mb-1">Next step</span>
-                      <p className="text-slate-200/85 leading-7">{fallbackText(topTeam.canvas.implementation, "You have not yet defined the immediate validation step. The logical next move would be to specify a pilot, prototype or initial analysis to review the idea.")}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-6">Sustainable Innovation Lab session completed</p>
-            <button onClick={onRestart} className="biolab-btn-ghost">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-              New session
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const copySummary = async () => {
+    try {
+      await navigator.clipboard.writeText(summary);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col py-20 biolab-grid-pattern">
       <div className="biolab-container">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-14">
-          <span className="biolab-phase mb-5 inline-flex">Phase 08 — Results</span>
-          <h2 className="biolab-section-title mb-3">Most-voted proposal</h2>
-          <p className="biolab-subtitle max-w-3xl mx-auto">
-            This does not mean “right answer”. It means the group considered this the <strong>most promising proposal</strong> to continue exploring at Airbus.
-          </p>
-        </motion.div>
+        <motion.header initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="biolab-stage-header mb-10">
+          <div>
+            <span className="biolab-phase mb-5 inline-flex">Stage 08 — Design review</span>
+            <h2 className="biolab-section-title mb-3">From workshop idea to evidence-ready concept</h2>
+            <p className="biolab-subtitle max-w-3xl">
+              {competitive
+                ? "The group has identified the most promising concept. The readiness review below shows what is strong and what must be validated next."
+                : "This is a design review, not a winner screen. It shows how clearly the concept connects biology, engineering and a testable next step."}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 print:hidden">
+            <button onClick={copySummary} className="biolab-btn-ghost">
+              {copied ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+              {copied ? "Copied" : "Copy summary"}
+            </button>
+            <button onClick={() => window.print()} className="biolab-btn-primary"><Printer className="h-4 w-4" /> Print / save PDF</button>
+          </div>
+        </motion.header>
 
-        <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="max-w-6xl mx-auto mb-10">
-          <div className="biolab-card-dark py-10 px-8 relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1" style={{ background: "var(--gradient-accent)" }} />
-            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center">
-              <div>
-                <span className="biolab-label block mb-2" style={{ color: "hsl(45, 95%, 60%)" }}>Most-voted proposal</span>
-                <h3 className="text-3xl md:text-4xl font-bold font-display mb-3 text-white">{topTitle}</h3>
-                <p className="text-sm mb-5 text-slate-300">Team {topTeam.name}</p>
-                <p className="text-base leading-relaxed max-w-2xl mb-6 text-slate-200/85">
-                  {fallbackText(
-                    topTeam.pitchSummary,
-                    "The proposal received the most votes, although it still needs a more polished executive summary before it can be presented outside the workshop."
-                  )}
+        <motion.section initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="max-w-6xl mx-auto mb-7">
+          <div className="biolab-card-dark p-0 overflow-hidden">
+            <div className="h-1.5" style={{ background: "var(--gradient-accent)" }} />
+            <div className="grid lg:grid-cols-[1.12fr_0.88fr]">
+              <div className="p-7 md:p-9">
+                <div className="flex flex-wrap items-center gap-2 mb-5">
+                  <span className="biolab-evidence-chip">WORKSHOP OUTPUT</span>
+                  {competitive && <span className="biolab-evidence-chip">MOST VOTED · {topTeam.votes} {topTeam.votes === 1 ? "VOTE" : "VOTES"}</span>}
+                </div>
+                <p className="biolab-label mb-2">Team {topTeam.name}</p>
+                <h3 className="text-3xl md:text-5xl leading-tight font-display font-bold text-white mb-5">{title}</h3>
+                <p className="text-base md:text-lg text-slate-300 leading-8 mb-7">
+                  {fallback(topTeam.pitchSummary, "The concept needs a concise pitch before it can be reviewed outside this workshop.")}
                 </p>
-                <div className="flex flex-wrap items-center gap-8 text-center">
-                  <div>
-                    <span className="block text-3xl font-display font-bold" style={{ color: "hsl(45, 95%, 60%)" }}>{topTeam.votes}</span>
-                    <span className="font-mono-label" style={{ color: "hsl(210, 15%, 45%)" }}>{topTeam.votes === 1 ? "vote" : "votes"}</span>
-                  </div>
-                  <div>
-                    <span className="block text-sm font-medium text-slate-100">{fallbackText(topTeam.challenge?.title, "No challenge")}</span>
-                    <span className="font-mono-label" style={{ color: "hsl(210, 15%, 45%)" }}>challenge</span>
-                  </div>
-                  <div>
-                    <span className="block text-sm font-medium text-slate-100">{fallbackText(topTeam.organism?.name, "No model")}</span>
-                    <span className="font-mono-label" style={{ color: "hsl(210, 15%, 45%)" }}>model</span>
-                  </div>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  {[
+                    ["Challenge", fallback(topTeam.challenge?.title, "Not defined")],
+                    ["Natural model", fallback(topTeam.organism?.name, "Not selected")],
+                    ["Principle", fallback(topTeam.organism?.principle, "Not defined")],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <span className="biolab-label block mb-2">{label}</span>
+                      <p className="text-sm font-semibold text-slate-100 leading-6">{value}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+              <div className="relative min-h-[320px] border-t lg:border-t-0 lg:border-l border-white/10">
                 {topTeam.organism?.image ? (
-                  <img src={topTeam.organism.image} alt={topTeam.organism.name} className="w-full h-64 object-cover rounded-2xl" referrerPolicy="no-referrer" />
+                  <img src={topTeam.organism.image} alt={topTeam.organism.name} className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-64 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 text-sm">
-                    No image available
-                  </div>
+                  <div className="absolute inset-0 grid place-items-center bg-white/5 text-slate-400">No natural model image</div>
                 )}
+                <div className="absolute inset-x-0 bottom-0 p-5 bg-gradient-to-t from-slate-950/95 to-transparent">
+                  <p className="text-xs uppercase tracking-[0.16em] text-slate-400">Biological reference</p>
+                  <p className="text-xl font-display font-bold text-white">{fallback(topTeam.organism?.name, "Not selected")}</p>
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </motion.section>
 
-        <div className="max-w-6xl mx-auto space-y-3 mb-16">
-          {sorted.slice(1).map((team, i) => (
-            <motion.div
-              key={team.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + i * 0.08 }}
-              className="biolab-card"
-            >
-              <div className="flex items-center gap-5">
-                <span className="font-mono text-lg font-bold text-muted-foreground w-8 text-center">{String(i + 2).padStart(2, "0")}</span>
-                <div className="w-3 h-8 rounded-sm" style={{ background: team.color }} />
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-semibold font-display text-foreground">{makeTitle(team)}</h3>
-                  <span className="text-xs text-muted-foreground">Team {team.name}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-28 h-1.5 rounded-full bg-muted overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${maxVotes > 0 ? (team.votes / maxVotes) * 100 : 0}%` }}
-                      transition={{ delay: 0.5 + i * 0.08, duration: 0.4 }}
-                      className="h-full rounded-full"
-                      style={{ background: team.color }}
-                    />
-                  </div>
-                  <span className="font-display font-bold text-foreground text-lg w-8 text-right">{team.votes}</span>
-                </div>
+        <section className="max-w-6xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-6 mb-7">
+          <div className="biolab-card">
+            <div className="flex items-start justify-between gap-5 mb-6">
+              <div>
+                <span className="biolab-label block mb-2">Design readiness</span>
+                <h3 className="text-2xl font-display font-bold text-foreground">{readiness}/4 evidence gates</h3>
               </div>
-            </motion.div>
-          ))}
-        </div>
+              <div className="h-14 w-14 rounded-2xl grid place-items-center bg-primary/8 text-primary"><ShieldCheck className="h-7 w-7" /></div>
+            </div>
+            <div className="space-y-3">
+              {checks.map((check) => (
+                <div key={check.label} className={`biolab-check-row ${check.passed ? "is-passed" : ""}`}>
+                  <span>{check.passed ? <Check className="h-4 w-4" strokeWidth={3} /> : "—"}</span>
+                  <div><strong>{check.label}</strong><small>{check.text}</small></div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-6">Sustainable Innovation Lab session completed</p>
-          <button onClick={onRestart} className="biolab-btn-ghost">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            New session
-          </button>
+          <div className="biolab-card">
+            <span className="biolab-label block mb-4">Technical handoff</span>
+            <div className="space-y-4">
+              {[
+                ["Proposed solution", fallback(topTeam.canvas.solution, "Make the proposed application more specific.")],
+                ["Expected impact", fallback(topTeam.canvas.benefit, "Define the expected technical, operational or environmental improvement.")],
+                ["First validation step", fallback(topTeam.canvas.implementation, "Specify a simulation, prototype or comparative analysis.")],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-2xl border border-border bg-muted/35 p-4">
+                  <strong className="text-sm font-display text-foreground">{label}</strong>
+                  <p className="text-sm text-muted-foreground leading-6 mt-1">{value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {sorted.length > 1 && (
+          <section className="max-w-6xl mx-auto biolab-card mb-7">
+            <div className="flex flex-wrap justify-between gap-3 mb-5">
+              <div><span className="biolab-label block mb-2">Team comparison</span><h3 className="text-xl font-display font-bold text-foreground">Voting overview</h3></div>
+              <p className="text-sm text-muted-foreground">Votes indicate preference, not technical validation.</p>
+            </div>
+            <div className="space-y-3">
+              {sorted.map((team, index) => (
+                <div key={team.id} className="flex items-center gap-4 rounded-2xl border border-border p-4">
+                  <span className="font-mono text-sm font-bold text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="h-8 w-2 rounded-full" style={{ background: team.color }} />
+                  <div className="flex-1 min-w-0"><strong className="block truncate text-foreground">{proposalTitle(team)}</strong><small className="text-muted-foreground">Team {team.name}</small></div>
+                  <strong className="text-xl font-display text-foreground">{team.votes}</strong>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="max-w-6xl mx-auto biolab-callout mb-8">
+          <strong>Responsible interpretation</strong>
+          <p>This output is an early design hypothesis. A nature-inspired concept should not be presented as technically feasible or environmentally beneficial until testing, lifecycle implications and unintended effects have been assessed.</p>
+        </section>
+
+        <div className="text-center print:hidden">
+          <p className="text-sm text-muted-foreground mb-5">Bio-Inspired Innovation Lab completed · progress remains saved on this device</p>
+          <button onClick={onRestart} className="biolab-btn-ghost"><RotateCcw className="h-4 w-4" /> Start a new session</button>
         </div>
       </div>
     </div>

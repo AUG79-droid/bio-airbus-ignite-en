@@ -7,7 +7,7 @@ interface PitchScreenProps {
 }
 
 export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
-  const { activeTeam, updatePitch } = useBioLab();
+  const { activeTeam, activeTeamIndex, teams, updatePitch, setActiveTeam, isPitchComplete } = useBioLab();
   if (!activeTeam) return null;
 
   const challenge = activeTeam.challenge;
@@ -23,6 +23,14 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
   ];
 
   const completedItems = canvasPreview.filter((item) => item.value && item.value.trim().length > 0).length;
+  const pitchIsReady = activeTeam.pitchTitle.trim().length > 0 && activeTeam.pitchSummary.trim().length > 0;
+  const nextIncompleteTeamIndex = teams.findIndex((team, index) => index !== activeTeamIndex && !isPitchComplete(team));
+  const hasAnotherTeamToComplete = nextIncompleteTeamIndex >= 0;
+
+  const continueRoute = () => {
+    if (hasAnotherTeamToComplete) setActiveTeam(nextIncompleteTeamIndex);
+    else onNext();
+  };
 
   const suggestedPitch = [
     canvas.problem && `We are addressing ${canvas.problem}`,
@@ -103,7 +111,7 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <span className="biolab-label block mb-2">Step 2</span>
                   <p className="text-sm text-slate-200/80 leading-6">
-                    Explain the natural inspiration and the principle you are borrowing, without digressions or unnecessary theory.
+                    Explain the natural inspiration and the principle you are borrowing, using only the theory needed to make the causal mechanism clear.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -195,10 +203,12 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
 
         <div className="flex justify-center gap-4 flex-wrap">
           <button onClick={onBack} className="biolab-btn-ghost">← Back to the canvas</button>
-          <button onClick={onNext} className="biolab-btn-accent">
-            Go to step 7: open voting
+          <button onClick={continueRoute} className="biolab-btn-accent" disabled={!pitchIsReady} title={!pitchIsReady ? "Add a proposal name and a pitch to continue" : undefined}>
+            {hasAnotherTeamToComplete ? `Continue with ${teams[nextIncompleteTeamIndex].name}` : "Go to step 7: open review"}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
           </button>
+          {!pitchIsReady && <p className="w-full text-center text-xs text-muted-foreground">Add both a proposal name and a 60-second pitch to continue.</p>}
+          {pitchIsReady && hasAnotherTeamToComplete && <p className="w-full text-center text-xs text-muted-foreground">All teams complete the same route before group review is unlocked.</p>}
         </div>
       </div>
     </div>
