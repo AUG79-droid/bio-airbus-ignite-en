@@ -13,7 +13,7 @@ import ResultsScreen from "@/components/biolab/ResultsScreen";
 import { AnimatePresence, motion } from "framer-motion";
 
 function BioLabApp() {
-  const { currentScreen, nextScreen, prevScreen, setScreen } = useBioLab();
+  const { currentScreen, nextScreen, prevScreen, resetSession } = useBioLab();
 
   const screens = [
     <WelcomeScreen onNext={nextScreen} />,
@@ -25,7 +25,7 @@ function BioLabApp() {
     <BioCanvasScreen onNext={nextScreen} onBack={prevScreen} />,
     <PitchScreen onNext={nextScreen} onBack={prevScreen} />,
     <VotingScreen onNext={nextScreen} onBack={prevScreen} />,
-    <ResultsScreen onRestart={() => setScreen(0)} />,
+    <ResultsScreen onRestart={resetSession} />,
   ];
 
   return (
@@ -38,7 +38,7 @@ function BioLabApp() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className={currentScreen > 0 ? "pt-14" : ""}
+          className={currentScreen > 0 ? "pt-16" : ""}
         >
           {screens[currentScreen]}
         </motion.div>
