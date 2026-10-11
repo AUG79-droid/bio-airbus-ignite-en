@@ -1,320 +1,184 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
-import { CanvasData } from "@/data/biolab-data";
+import { CanvasData, isCanvasEntryReady, isLegacyCanvasExample, MIN_CANVAS_CHARS } from "@/data/biolab-data";
 
-interface BioCanvasScreenProps {
-  onNext: () => void;
-  onBack: () => void;
-}
-
-const CANVAS_FIELDS: {
-  key: keyof CanvasData;
-  label: string;
-  sublabel: string;
-  helper: string;
-  placeholder: string;
-  span?: boolean;
-}[] = [
-  {
-    key: "problem",
-    label: "01 — Define the Airbus problem",
-    sublabel: "What specific challenge will you solve?",
-    helper: "Describe the problem in specific technical terms. Avoid generic statements.",
-    placeholder:
-      "Example: The cabin needs more efficient ventilation and thermal control to reduce energy consumption and maintain comfort without increasing system complexity.",
-  },
-  {
-    key: "organism",
-    label: "02 — Explain the natural model",
-    sublabel: "Which organism or natural system have you selected?",
-    helper: "Describe what it does in nature and why it is relevant to this challenge.",
-    placeholder:
-      "Example: The termite mound regulates temperature and ventilation through passive airflow, without continuous air conditioning.",
-  },
-  {
-    key: "principle",
-    label: "03 — Formulate the principle to emulate",
-    sublabel: "Which functional mechanism will you transfer?",
-    helper: "Do not copy the form itself; capture the functional logic behind it.",
-    placeholder:
-      "Example: Use passive circulation, thermal gradients and optimised air inlets and outlets to stabilise temperature with less energy.",
-  },
-  {
-    key: "solution",
-    label: "04 — Translate it into an Airbus solution",
-    sublabel: "How does it become a real proposal?",
-    helper: "Apply the idea to a specific Airbus part, system, area or process.",
-    placeholder:
-      "Example: Design a termite-inspired cabin ventilation architecture with optimised passive inlets and outlets to reduce demand on the active system.",
-    span: true,
-  },
-  {
-    key: "benefit",
-    label: "05 — Expected impact",
-    sublabel: "What improvement would it deliver?",
-    helper: "Consider efficiency, weight, energy, maintenance, comfort, robustness or cost.",
-    placeholder:
-      "Example: Lower energy consumption, better thermal distribution and less reliance on active air conditioning during specific operating phases.",
-  },
-  {
-    key: "implementation",
-    label: "06 — Next step",
-    sublabel: "What would you validate first?",
-    helper: "Do not plan the entire project—focus on the first useful validation step.",
-    placeholder:
-      "Example: Model airflow using CFD and compare a conventional configuration with a termite-inspired alternative.",
-  },
+interface BioCanvasScreenProps { onNext: () => void; onBack: () => void; }
+type FieldGuide = {
+  key: keyof CanvasData; short: string; title: string; question: string;
+  explain: string; thinkAbout: string[]; placeholder: string;
+};
+const GUIDES: FieldGuide[] = [
+  {key:"problem",short:"Problem",title:"Define the Airbus problem",question:"Exactly what do you need to improve, and in which operation?",
+   explain:"You do not need a solution yet. Describe the current situation, the improvement sought and the constraints.",
+   thinkAbout:["Which part, system or process is affected?","What specific difficulty exists today?","How could you measure an improvement?"],
+   placeholder:"Describe the technical problem, where it occurs and what outcome you want to improve."},
+  {key:"organism",short:"Natural model",title:"Explain how the natural model works",question:"What function does the organism perform, and how?",
+   explain:"Describe the natural mechanism, not merely the organism's name or appearance.",
+   thinkAbout:["What function does it perform?","Which structure or behaviour causes that function?","What evidence would confirm that mechanism?"],
+   placeholder:"Explain the organism's function and the natural mechanism you wish to investigate."},
+  {key:"principle",short:"Principle",title:"Extract a functional principle",question:"What functional principle might transfer to engineering?",
+   explain:"Translate the natural strategy into a technical function. Visual resemblance is not enough.",
+   thinkAbout:["What causes the natural effect?","Why might it help solve your chosen challenge?","Which parts would not transfer to aerospace?"],
+   placeholder:"State the functional principle, its underlying mechanism and the expected effect."},
+  {key:"solution",short:"Solution",title:"Propose a concrete Airbus application",question:"What would you change in a part, tool or process, and why might it help?",
+   explain:"This is the core of your proposal. Link problem and mechanism as a hypothesis, not as a proven result.",
+   thinkAbout:["What exactly would change, and where?","Why would that natural mechanism cause an improvement?","Which safety, weight, material, certification or maintenance constraints apply?"],
+   placeholder:"We propose changing [part or process] by [mechanism] because [technical link]. We would need to check [constraint]."},
+  {key:"benefit",short:"Expected benefit",title:"Define the improvement you want to test",question:"Which outcome do you expect if the idea works?",
+   explain:"State an expected improvement, not a measured saving or already-demonstrated benefit.",
+   thinkAbout:["Which metric would you compare with the current solution?","What negative effects could appear?","Which data do you still need to quantify the improvement?"],
+   placeholder:"Our hypothesis is to improve [metric] over [current baseline], provided [risk or constraint] is assessed."},
+  {key:"implementation",short:"First test",title:"Plan an initial feasibility test",question:"What test could show whether the proposal deserves further work?",
+   explain:"You are not creating an industrial rollout plan. Define a first check that could support or reject the hypothesis.",
+   thinkAbout:["Would you start with a simulation, laboratory test or comparative trial?","What would you measure against what reference?","Which result would make you revise or reject your idea?"],
+   placeholder:"First, we would compare [concept] with [baseline] using [test], measuring [indicator and criterion]."}
 ];
 
-function cleanSentence(text?: string) {
-  return (text || "").trim().replace(/\s+/g, " ").replace(/[.]$/, "");
-}
-
-function buildExamples(challenge?: { title?: string; description?: string }, organism?: { name?: string; strategy?: string; principle?: string }) {
-  const challengeTitle = challenge?.title || "the selected Airbus challenge";
-  const challengeDescription = cleanSentence(challenge?.description) || "address a specific technical need";
-  const organismName = organism?.name || "the selected natural model";
-  const organismStrategy = cleanSentence(organism?.strategy) || "performs this function efficiently in nature";
-  const principle = cleanSentence(organism?.principle) || "a useful biomimetic principle";
-
-  return {
-    problem: `The team wants to address ${challengeTitle.toLowerCase()} at Airbus. The specific problem is to ${challengeDescription.toLowerCase()} through a technically viable solution without adding unnecessary complexity.`,
-    organism: `${organismName} is relevant because it ${organismStrategy.toLowerCase()}. It is a useful reference because it performs a function similar to the Airbus challenge efficiently.`,
-    principle: `The principle we want to emulate is ${principle.toLowerCase()}. We are not copying the organism's form; we are transferring the functional logic it uses to solve the problem.`,
-    solution: `We propose translating ${principle.toLowerCase()} into an Airbus solution for ${challengeTitle.toLowerCase()}. The idea is to design a technical proposal inspired by ${organismName.toLowerCase()} that improves system performance without significantly increasing weight, energy consumption or maintenance.`,
-    benefit: `The expected impact is improved performance for ${challengeTitle.toLowerCase()}, fewer operational inefficiencies and a stronger technical basis for future tests or pilots.`,
-    implementation: `A reasonable next step would be an initial validation: a simulation, functional mock-up or comparative analysis between the current solution and an alternative inspired by ${organismName.toLowerCase()}.`,
-  } satisfies Record<keyof CanvasData, string>;
-}
-
-export default function BioCanvasScreen({ onNext, onBack }: BioCanvasScreenProps) {
-  const { activeTeam, updateCanvas } = useBioLab();
-  if (!activeTeam) return null;
-
-  const completedFields = CANVAS_FIELDS.filter((f) => activeTeam.canvas[f.key].trim().length > 0).length;
-  const canContinue = completedFields === CANVAS_FIELDS.length;
-  const challenge = activeTeam.challenge;
-  const organism = activeTeam.organism;
-  const examples = buildExamples(challenge, organism);
-
-  const injectExample = (key: keyof CanvasData) => {
-    if (!activeTeam.canvas[key].trim()) {
-      updateCanvas(key, examples[key]);
-    }
-  };
+export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
+  const {activeTeam,updateCanvas,setScreen,setGuideSubstep}=useBioLab();
+  const [activeIndex,setActiveIndex]=useState(0);
+  useEffect(()=>setGuideSubstep(activeIndex),[activeIndex,setGuideSubstep]);
+  if(!activeTeam) return null;
+  const challenge=activeTeam.challenge;
+  const organism=activeTeam.organism;
+  const current=GUIDES[activeIndex];
+  const answer=activeTeam.canvas[current.key];
+  const count=GUIDES.filter(g=>isCanvasEntryReady(g.key,activeTeam.canvas[g.key])).length;
+  const canContinue=count===GUIDES.length;
+  const isLegacy=isLegacyCanvasExample(current.key,answer);
+  const isReady=isCanvasEntryReady(current.key,answer);
+  const mismatch=challenge?.id==="c7" && organism?.id==="o4";
 
   return (
-    <div className="min-h-screen flex flex-col py-20 biolab-grid-pattern">
+    <div className="min-h-screen py-20 biolab-grid-pattern">
       <div className="biolab-container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-5 mb-8"
-        >
-          <div>
-            <span className="biolab-phase mb-4 inline-flex">Stage 05 — Design</span>
-            <h2 className="biolab-section-title mb-3">Now turn your idea into a proposal</h2>
-            <p className="biolab-subtitle max-w-3xl">
-              This is step 5 of 6. Define <strong>which problem you will solve</strong>, <strong>which natural principle you will emulate</strong> and <strong>how it will translate to Airbus</strong>.
+        <motion.header initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} className="max-w-6xl mx-auto mb-6">
+          <span className="biolab-phase mb-4 inline-flex">Stage 05 of 06 · Design your solution</span>
+          <h1 className="biolab-section-title mb-3">Now build your own proposal</h1>
+          <p className="biolab-subtitle max-w-4xl">
+            Your task is to explain <strong>how a natural strategy might solve a real Airbus-context challenge</strong>.
+            Complete six sections, one at a time, in your own words. The app does not supply a ready-made answer.
+          </p>
+        </motion.header>
+        <section className="max-w-6xl mx-auto biolab-card-dark mb-6" aria-label="Canvas instructions">
+          <h2 className="text-xl md:text-2xl font-display font-bold text-white mb-3">What do I do on this screen?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-slate-100 leading-7">
+            <p><strong className="text-amber-300">1. Review</strong> the challenge and natural model you selected.</p>
+            <p><strong className="text-amber-300">2. Write</strong> an original answer for each section. Hints are there to help you think.</p>
+            <p><strong className="text-amber-300">3. Check</strong> that the technical link makes sense and proceed to the pitch.</p>
+          </div>
+          <p className="mt-4 text-sm md:text-base text-slate-300">
+            Your work is saved locally in this browser as you type. The progress counter checks whether the sections
+            contain enough original text; it <strong>does not certify technical viability</strong>.
+          </p>
+        </section>
+        <section className="max-w-6xl mx-auto biolab-card mb-6" aria-label="Previous selections">
+          <h2 className="text-xl font-display font-bold text-foreground mb-4">Your starting point (already selected)</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <span className="biolab-label block mb-2">Airbus challenge</span>
+              <h3 className="text-lg font-semibold">{challenge?.title??"No challenge"}</h3>
+              <p className="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed">{challenge?.description}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <span className="biolab-label block mb-2">Natural inspiration</span>
+              <h3 className="text-lg font-semibold">{organism?.name??"No model"}</h3>
+              <p className="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed">{organism?.strategy}</p>
+            </div>
+            <div className="rounded-xl border border-border bg-muted/30 p-4">
+              <span className="biolab-label block mb-2">Observed principle</span>
+              <h3 className="text-lg font-semibold">{organism?.principle??"No principle"}</h3>
+              <p className="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed">
+                Your job is to justify <strong>whether the principle actually fits your challenge</strong>.
+              </p>
+            </div>
+          </div>
+        </section>
+        {mismatch && (
+          <section className="max-w-6xl mx-auto rounded-2xl border-2 border-amber-500 bg-amber-50 px-5 py-5 mb-6 text-slate-900" role="status">
+            <h2 className="text-lg font-bold mb-2">Caution: this connection is not yet justified</h2>
+            <p className="text-base leading-7 mb-4">
+              Shark skin can inspire surfaces affecting friction and adhesion. That does <strong>not, by itself,
+              explain how non-destructive fuselage inspections could be accelerated</strong>. You must justify
+              a specific applicable mechanism and a suitable test, or choose a model more closely related to
+              detection. Bats and echolocation could provide a functional sensing analogy, but that also needs validation.
             </p>
-          </div>
-
-          <div className="flex items-center gap-3 bg-card border border-border rounded-2xl px-4 py-3 shadow-sm">
-            <div className="flex gap-1.5">
-              {CANVAS_FIELDS.map((f) => (
-                <div
-                  key={f.key}
-                  className={`w-2.5 h-7 rounded-sm ${activeTeam.canvas[f.key].trim() ? "bg-success" : "bg-border"}`}
-                />
-              ))}
-            </div>
+            <button type="button" className="biolab-btn-primary" onClick={()=>setScreen(4)}>Choose another natural model</button>
+          </section>
+        )}
+        <section className="max-w-6xl mx-auto biolab-card mb-6" aria-label="Proposal canvas editor">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-5">
             <div>
-              <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Completed blocks</div>
-              <div className="text-sm font-semibold text-foreground">{completedFields}/{CANVAS_FIELDS.length}</div>
+              <h2 className="text-xl font-display font-bold">Your proposal: section {activeIndex+1} of 6</h2>
+              <p className="text-sm md:text-base text-muted-foreground">
+                {count} of 6 sections contain sufficient original text. You can return and edit any answer.
+              </p>
+            </div>
+            <div aria-live="polite" className="text-base font-semibold text-primary">{count}/6 written</div>
+          </div>
+          <nav className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-7" aria-label="Canvas sections">
+            {GUIDES.map((g,index)=>{
+              const ready=isCanvasEntryReady(g.key,activeTeam.canvas[g.key]);
+              return <button key={g.key} type="button" onClick={()=>setActiveIndex(index)}
+                aria-current={index===activeIndex?"step":undefined}
+                className={`rounded-xl border p-3 text-left text-sm md:text-base font-semibold transition-colors ${index===activeIndex?"bg-primary text-primary-foreground border-primary":"bg-background border-border hover:border-primary/40 text-foreground"}`}>
+                <span className="block text-xs mb-1">{String(index+1).padStart(2,"0")} · {ready?"✓ Written":"Pending"}</span>{g.short}
+              </button>;
+            })}
+          </nav>
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-7">
+            <span className="biolab-label block mb-2">Section {String(activeIndex+1).padStart(2,"0")}</span>
+            <h3 className="text-2xl font-bold font-display mb-3">{current.title}</h3>
+            <p className="text-lg md:text-xl font-semibold mb-3">{current.question}</p>
+            <p className="text-base text-muted-foreground leading-7 mb-5">{current.explain}</p>
+            <details className="rounded-xl border border-border bg-card p-4 mb-5">
+              <summary className="cursor-pointer text-base font-semibold text-primary">Thinking prompts</summary>
+              <ul className="mt-3 pl-5 list-disc space-y-2 text-base text-foreground leading-7">
+                {current.thinkAbout.map(item=><li key={item}>{item}</li>)}
+              </ul>
+            </details>
+            <label htmlFor={`canvas-${current.key}`} className="block font-semibold text-base mb-2">Your answer (write it here):</label>
+            <textarea id={`canvas-${current.key}`} value={answer}
+              onChange={event=>updateCanvas(current.key,event.target.value)}
+              placeholder={current.placeholder} rows={7}
+              className="biolab-input resize-y text-base md:text-lg leading-relaxed min-h-[180px] bg-white"/>
+            {isLegacy&&<p className="mt-3 rounded-lg border border-amber-400 bg-amber-100 px-4 py-3 text-base text-amber-950" role="status">
+              This field still contains a previously inserted sample answer. We have kept it, but <strong>you need to rewrite
+              it in your own words</strong> to count this section as written.
+            </p>}
+            <div className="flex flex-wrap justify-between gap-3 mt-3 text-sm md:text-base">
+              <span className="text-muted-foreground" aria-live="polite">
+                {isReady?"✓ Text entered. Review its technical quality before continuing.":isLegacy?"Rewrite the old sample to continue":
+                  `Write at least ${MIN_CANVAS_CHARS} characters to register this section.`}
+              </span>
+              <span className="text-muted-foreground">{answer.trim().length} characters</span>
             </div>
           </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-6xl mx-auto mb-8"
-        >
-          <div className="biolab-card-dark px-6 py-6">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-6 items-start">
-              <div>
-                <span className="biolab-label block mb-3" style={{ color: "hsl(45, 95%, 65%)" }}>
-                  What to do here
-                </span>
-                <h3 className="text-2xl md:text-3xl font-bold font-display text-white mb-4">
-                  Build your proposal with Airbus logic, not vague statements
-                </h3>
-                <p className="text-base md:text-lg leading-8 text-slate-200/90 mb-5">
-                  You have selected a <strong>challenge</strong> and a <strong>natural model</strong>. Now write a proposal that others can understand, defend and present. Do not aim for perfection: begin with the first three blocks, then make the solution concrete.
-                </p>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <span className="biolab-label block mb-2">Recommended order</span>
-                  <ul className="space-y-2 text-sm md:text-base text-slate-200/85 leading-7">
-                    <li>• Start with <strong>01 Problem</strong>, <strong>02 Biological model</strong> and <strong>03 Principle</strong>.</li>
-                    <li>• Then move to <strong>04 Proposed solution</strong>, the most important section.</li>
-                    <li>• Finish with <strong>05 Expected impact</strong> and <strong>06 Next step</strong>.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <span className="biolab-label block mb-2">Step 1</span>
-                  <p className="text-sm text-slate-200/80 leading-6">
-                    Make sure the <strong>challenge</strong>, <strong>natural model</strong> and <strong>principle</strong> fit together.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <span className="biolab-label block mb-2">Step 2</span>
-                  <p className="text-sm text-slate-200/80 leading-6">
-                    If you get stuck, use the <strong>starter examples</strong> below and adapt them to your case.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <span className="biolab-label block mb-2">Step 3</span>
-                  <p className="text-sm text-slate-200/80 leading-6">
-                    Once all six blocks are reasonably clear, use the blue button to move to the <strong>pitch</strong>.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="mt-6 flex items-center justify-between gap-3 flex-wrap">
+            <button type="button" className="biolab-btn-ghost" disabled={activeIndex===0} onClick={()=>setActiveIndex(n=>Math.max(0,n-1))}>← Previous section</button>
+            <button type="button" className="biolab-btn-primary" disabled={activeIndex===GUIDES.length-1} onClick={()=>setActiveIndex(n=>Math.min(GUIDES.length-1,n+1))}>Next section →</button>
           </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-6xl mx-auto mb-8">
-          <div className="grid grid-cols-1 xl:grid-cols-[1.1fr_340px] gap-5 items-stretch">
-            <div className="biolab-card p-5">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="rounded-2xl border border-border bg-background/70 p-4">
-                  <span className="biolab-label block mb-2">Challenge you will solve</span>
-                  <h4 className="text-lg font-semibold font-display text-foreground mb-2">{challenge?.title ?? "—"}</h4>
-                  <p className="text-sm text-muted-foreground leading-6">{challenge?.description ?? "—"}</p>
-                </div>
-                <div className="rounded-2xl border border-border bg-background/70 p-4">
-                  <span className="biolab-label block mb-2">Selected natural model</span>
-                  <h4 className="text-lg font-semibold font-display text-foreground mb-3">{organism?.name ?? "—"}</h4>
-                  <p className="text-sm text-muted-foreground leading-6">{organism?.strategy ?? "—"}</p>
-                </div>
-                <div className="rounded-2xl border border-border bg-background/70 p-4">
-                  <span className="biolab-label block mb-2">Principle you will transfer</span>
-                  <h4 className="text-lg font-semibold font-display text-foreground mb-2">{organism?.principle ?? "—"}</h4>
-                  <p className="text-sm text-muted-foreground leading-6">This is the functional mechanism you will now turn into an Airbus solution.</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="biolab-card overflow-hidden p-0">
-              {organism?.image ? (
-                <img
-                  src={organism.image}
-                  alt={organism.name}
-                  className="w-full h-full min-h-[240px] object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="min-h-[240px] flex items-center justify-center text-muted-foreground">No image</div>
-              )}
-            </div>
+        </section>
+        <section className="max-w-6xl mx-auto rounded-2xl border border-border bg-white px-5 py-5 mb-7">
+          <h2 className="text-lg font-bold mb-3">Before you present, review your proposal</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-base leading-7">
+            <p>□ Have you defined a specific technical problem?</p>
+            <p>□ Have you explained <strong>how</strong> the natural mechanism could help?</p>
+            <p>□ Have you considered safety and operational constraints?</p>
+            <p>□ Have you proposed a test that could support or reject the hypothesis?</p>
           </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto mb-8">
-          <div className="biolab-card p-5">
-            <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
-              <div>
-                <span className="biolab-label block mb-2">Starter examples to unlock the canvas</span>
-                <h3 className="text-xl font-display font-bold text-foreground">Do not copy them word for word: adapt them to your case</h3>
-              </div>
-              <div className="text-sm text-muted-foreground max-w-xl">
-                They are generated from your <strong>Airbus challenge</strong>, <strong>selected natural model</strong> and <strong>biomimetic principle</strong>.
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {CANVAS_FIELDS.map((field) => (
-                <div key={field.key} className="rounded-2xl border border-border bg-background/70 p-4 flex flex-col gap-3">
-                  <div>
-                    <h4 className="text-sm font-semibold font-display text-foreground">{field.label}</h4>
-                    <p className="text-xs text-muted-foreground mt-1">{field.sublabel}</p>
-                  </div>
-                  <p className="text-sm leading-6 text-muted-foreground">{examples[field.key]}</p>
-                  <button
-                    type="button"
-                    onClick={() => injectExample(field.key)}
-                    className="biolab-btn-ghost self-start"
-                  >
-                    Use this starter example
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="max-w-6xl mx-auto mb-8">
-          <div className="biolab-rubric">
-            <div>
-              <span className="biolab-label block mb-2">Quality gate</span>
-              <h3 className="text-lg font-display font-bold text-foreground">A credible concept should pass four checks</h3>
-            </div>
-            {[
-              ["Specific", "A bounded technical problem"],
-              ["Causal", "Mechanism explains the effect"],
-              ["Constrained", "Safety, mass and operations considered"],
-              ["Testable", "A measurable first experiment"],
-            ].map(([title, text]) => (
-              <div key={title} className="biolab-rubric-item"><strong>{title}</strong><span>{text}</span></div>
-            ))}
-          </div>
-        </motion.div>
-
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
-          {CANVAS_FIELDS.map((field, i) => (
-            <motion.div
-              key={field.key}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className={`biolab-card ${field.span ? "md:col-span-2" : ""}`}
-            >
-              <div className="mb-3 flex items-start justify-between gap-3 flex-wrap">
-                <div>
-                  <h3 className="text-sm font-semibold font-display text-foreground">{field.label}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{field.sublabel}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => injectExample(field.key)}
-                  className="biolab-btn-ghost"
-                >
-                  Insert example
-                </button>
-              </div>
-              <div className="rounded-xl border border-border/80 bg-background/60 px-3 py-2 mb-3">
-                <p className="text-xs text-muted-foreground leading-5">{field.helper}</p>
-              </div>
-              <textarea
-                value={activeTeam.canvas[field.key]}
-                onChange={(e) => updateCanvas(field.key, e.target.value)}
-                placeholder={field.placeholder}
-                rows={field.span ? 5 : 4}
-                className="biolab-input resize-none text-sm leading-relaxed"
-              />
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="flex justify-center gap-4 flex-wrap">
-          <button onClick={onBack} className="biolab-btn-ghost">← Back to connection</button>
-          <button onClick={onNext} className="biolab-btn-primary" disabled={!canContinue} title={!canContinue ? "Complete all six canvas blocks to continue" : undefined}>
-            Go to step 6: prepare the pitch
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+          <p className="text-sm md:text-base text-muted-foreground mt-3">These are self-review prompts, not automated quality assessments.</p>
+        </section>
+        <div className="max-w-6xl mx-auto flex flex-wrap justify-center items-center gap-4 pb-10">
+          <button type="button" onClick={onBack} className="biolab-btn-ghost">← Back to connection</button>
+          <button type="button" onClick={onNext} className="biolab-btn-primary" disabled={!canContinue}
+            title={!canContinue?"Write all six sections in your own words before preparing the pitch.":undefined}>
+            I have written all six sections · Prepare my pitch →
           </button>
-          {!canContinue && <p className="w-full text-center text-xs text-muted-foreground">Complete the {CANVAS_FIELDS.length - completedFields} remaining canvas {CANVAS_FIELDS.length - completedFields === 1 ? "block" : "blocks"} to unlock the pitch.</p>}
+          {!canContinue&&<p className="w-full text-center text-sm md:text-base text-muted-foreground" role="status">
+            {GUIDES.length-count} sections still need original text. You do not need to copy any sample.
+          </p>}
         </div>
       </div>
     </div>
