@@ -13,6 +13,7 @@ export default function MatchingScreen({ onNext, onBack }: MatchingScreenProps) 
   const challenge = activeTeam.challenge;
   const organism = activeTeam.organism;
   const principle = activeTeam.organism?.principle;
+  const needsJustification = challenge?.id === "c7" && organism?.id === "o4";
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-20 biolab-grid-pattern">
@@ -25,7 +26,7 @@ export default function MatchingScreen({ onNext, onBack }: MatchingScreenProps) 
           <span className="biolab-phase mb-5 inline-flex">Stage 04 — Connection</span>
           <h2 className="biolab-section-title mb-3">Now connect the challenge, nature and principle</h2>
           <p className="biolab-subtitle max-w-3xl mx-auto">
-            This step is not about guessing. It establishes the <strong>guiding idea</strong> your team will take into the canvas.
+            This is a <strong>review screen, not a writing task</strong>. Decide whether the natural mechanism could genuinely help your challenge. If the connection is weak, choose another model. <strong>You will write your own proposal in the Canvas</strong>.
           </p>
         </motion.div>
 
@@ -44,7 +45,7 @@ export default function MatchingScreen({ onNext, onBack }: MatchingScreenProps) 
                   Turn your selection into a clear working statement
                 </h3>
                 <p className="text-base md:text-lg leading-8 text-slate-200/90 mb-5">
-                  You have selected an <strong>Airbus challenge</strong> and a <strong>natural model</strong>. The app now shows the connection between them so that you understand <strong>which principle you will transfer</strong> before opening the canvas.
+                  You have selected an <strong>Airbus challenge</strong> and a <strong>natural model</strong>. The app displays your selections, but <strong>does not verify that they are technically compatible</strong>. Your job is to investigate how the natural mechanism might solve the Airbus challenge.
                 </p>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <span className="biolab-label block mb-2">What to check</span>
@@ -78,6 +79,20 @@ export default function MatchingScreen({ onNext, onBack }: MatchingScreenProps) 
               </div>
             </div>
           </motion.div>
+
+          {needsJustification && (
+            <section className="rounded-2xl border-2 border-amber-500 bg-amber-50 p-5 text-slate-900" role="status">
+              <h3 className="font-bold text-xl mb-2">Is this a technically justified pairing?</h3>
+              <p className="text-base leading-7 mb-3">
+                You selected non-destructive fuselage inspection and shark skin. Shark-skin microtextures
+                affect friction and adhesion, but <strong>do not by themselves explain how to detect
+                internal defects or speed up inspection</strong>. You need a real mechanism and a test.
+                A model linked to sensing, such as bat echolocation, could be a more directly relevant
+                starting point, but still needs proper validation.
+              </p>
+              <button type="button" className="biolab-btn-primary" onClick={onBack}>Review natural models</button>
+            </section>
+          )}
 
           <motion.div
             initial={{ opacity: 0, y: 18 }}
