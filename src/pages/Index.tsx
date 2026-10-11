@@ -1,5 +1,6 @@
 import { BioLabProvider, useBioLab } from "@/contexts/BioLabContext";
 import BioLabNav from "@/components/biolab/BioLabNav";
+import BioLabGuide from "@/components/biolab/BioLabGuide";
 import WelcomeScreen from "@/components/biolab/WelcomeScreen";
 import HowItWorksScreen from "@/components/biolab/HowItWorksScreen";
 import TeamsScreen from "@/components/biolab/TeamsScreen";
@@ -31,6 +32,7 @@ function BioLabApp() {
   return (
     <div className="min-h-screen bg-background">
       <BioLabNav />
+      <BioLabGuide />
       <AnimatePresence mode="wait">
         <motion.div
           key={currentScreen}
@@ -38,7 +40,7 @@ function BioLabApp() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className={currentScreen > 0 ? "pt-16" : ""}
+          className={currentScreen > 0 ? "pt-20" : ""}
         >
           {screens[currentScreen]}
         </motion.div>
