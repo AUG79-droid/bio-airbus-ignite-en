@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Check, Clipboard, Printer, RotateCcw, ShieldCheck } from "lucide-react";
 import { useBioLab } from "@/contexts/BioLabContext";
 import type { TeamData } from "@/data/biolab-data";
+import ReferenceComparison from "@/components/biolab/ReferenceComparison";
 
 interface ResultsScreenProps {
   onRestart: () => void;
@@ -21,23 +22,23 @@ function proposalTitle(team: TeamData) {
 function readinessChecks(team: TeamData) {
   return [
     {
-      label: "Problem defined",
-      text: "A specific aerospace need is stated.",
+      label: "Problem entered",
+      text: "Text has been entered, but technical quality is not assessed.",
       passed: hasText(team.canvas.problem) && Boolean(team.challenge),
     },
     {
-      label: "Mechanism abstracted",
-      text: "The biological strategy and principle are explicit.",
+      label: "Principle entered",
+      text: "A functional principle has been described, not technically verified.",
       passed: Boolean(team.organism) && hasText(team.canvas.principle),
     },
     {
-      label: "Transfer specified",
-      text: "The principle becomes a concrete Airbus-context idea.",
+      label: "Solution entered",
+      text: "The team wrote a solution; its mechanism has not been validated.",
       passed: hasText(team.canvas.solution),
     },
     {
-      label: "Validation proposed",
-      text: "A first test or comparison is identified.",
+      label: "Test entered",
+      text: "An initial test was described; it still needs review.",
       passed: hasText(team.canvas.implementation),
     },
   ];
@@ -70,7 +71,7 @@ export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
     `Proposed solution: ${fallback(topTeam.canvas.solution, "Not defined")}`,
     `Expected impact: ${fallback(topTeam.canvas.benefit, "Not defined")}`,
     `First validation step: ${fallback(topTeam.canvas.implementation, "Not defined")}`,
-    `Design readiness: ${readiness}/4 checks`,
+    `Information entered: ${readiness}/4 fields (not a technical assessment)`,
     `Status: Workshop hypothesis — not a validated technical or environmental claim.`,
   ].join("\n");
 
@@ -89,12 +90,12 @@ export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
       <div className="biolab-container">
         <motion.header initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="biolab-stage-header mb-10">
           <div>
-            <span className="biolab-phase mb-5 inline-flex">Stage 08 — Design review</span>
-            <h2 className="biolab-section-title mb-3">From workshop idea to evidence-ready concept</h2>
+            <span className="biolab-phase mb-5 inline-flex">Results · Final comparison</span>
+            <h2 className="biolab-section-title mb-3">Compare your proposal and find what to improve</h2>
             <p className="biolab-subtitle max-w-3xl">
               {competitive
-                ? "The group has identified the most promising concept. The readiness review below shows what is strong and what must be validated next."
-                : "This is a design review, not a winner screen. It shows how clearly the concept connects biology, engineering and a testable next step."}
+                ? "The teams have selected preferred concepts. Below, each team can compare all six answers with a reasoned example for the same challenge. Votes are not technical validation."
+                : "This is your final learning review. Below, compare your six answers with a reasoned reference for your challenge and identify what needs stronger evidence."}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 print:hidden">
@@ -153,7 +154,7 @@ export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
           <div className="biolab-card">
             <div className="flex items-start justify-between gap-5 mb-6">
               <div>
-                <span className="biolab-label block mb-2">Design readiness</span>
+                <span className="biolab-label block mb-2">Information entered</span>
                 <h3 className="text-2xl font-display font-bold text-foreground">{readiness}/4 evidence gates</h3>
               </div>
               <div className="h-14 w-14 rounded-2xl grid place-items-center bg-primary/8 text-primary"><ShieldCheck className="h-7 w-7" /></div>
@@ -204,9 +205,11 @@ export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
           </section>
         )}
 
+        <ReferenceComparison teams={sorted} />
+
         <section className="max-w-6xl mx-auto biolab-callout mb-8">
           <strong>Responsible interpretation</strong>
-          <p>This output is an early design hypothesis. A nature-inspired concept should not be presented as technically feasible or environmentally beneficial until testing, lifecycle implications and unintended effects have been assessed.</p>
+          <p>The references above support learning and comparison; they are not automatic grading, Airbus approval, engineering validation or evidence of an environmental benefit. Appropriate testing, risk assessment and lifecycle review are still needed.</p>
         </section>
 
         <div className="text-center print:hidden">
