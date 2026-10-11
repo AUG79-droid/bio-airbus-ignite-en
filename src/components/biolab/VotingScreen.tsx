@@ -29,9 +29,9 @@ export default function VotingScreen({ onNext, onBack }: VotingScreenProps) {
         <div className="biolab-container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
             <span className="biolab-phase mb-5 inline-flex">Phase 07 — Proposal review</span>
-            <h2 className="biolab-section-title mb-3">There is no “right answer” here</h2>
+            <h2 className="biolab-section-title mb-3">Review your proposal, then compare it with the reference here</h2>
             <p className="biolab-subtitle max-w-3xl mx-auto">
-              As this session has only <strong>one team</strong>, this screen is not a competition. It provides a <strong>quick review</strong> before the session closes.
+              With <strong>one team</strong>, voting is unnecessary. Review your proposal and open the final results, where you will be able to compare all six answers with a reasoned reference for your challenge.
             </p>
           </motion.div>
 
@@ -43,10 +43,10 @@ export default function VotingScreen({ onNext, onBack }: VotingScreenProps) {
                     What this result means
                   </span>
                   <h3 className="text-2xl md:text-3xl font-bold font-display text-white mb-4">
-                    This is not the “right” idea. It is the proposal your team has built.
+                    This is your team's proposal. Next you can compare it with a reasoned reference.
                   </h3>
                   <p className="text-base md:text-lg leading-8 text-slate-200/90 mb-5">
-                    Bio-Inspired Innovation Lab is not about finding one single solution. It is about generating a <strong>coherent</strong>, <strong>defensible</strong> proposal with a <strong>reasonable next step</strong>.
+                    There is not one unique valid design. At the end, compare your work with a complete reference case and identify what to strengthen or validate.
                   </p>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                     <span className="biolab-label block mb-2">Check this before you finish</span>
@@ -243,7 +243,7 @@ export default function VotingScreen({ onNext, onBack }: VotingScreenProps) {
         <div className="flex justify-center gap-4">
           <button onClick={onBack} className="biolab-btn-ghost">← Back to the pitch</button>
           <button onClick={onNext} className="biolab-btn-primary">
-            Go to step 8: view results
+            See results and reference solutions
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
           </button>
         </div>
