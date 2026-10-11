@@ -57,21 +57,21 @@ export default function NatureLibrary({ onNext, onBack }: NatureLibraryProps) {
                 <div className="min-w-0 rounded-2xl border border-white/20 bg-white/[0.08] px-5 py-5 md:px-6 md:py-6">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-300/45 bg-sky-300/10 text-base font-bold text-sky-200">01</span>
-                    <span className="text-sm font-bold uppercase tracking-wide text-sky-200">Step 1</span>
+                    <span className="text-sm font-bold uppercase tracking-wide text-sky-200">Explore the models</span>
                   </div>
                   <p className="text-base leading-7 text-slate-100">Review two or three cards and consider which natural function is most relevant to your challenge.</p>
                 </div>
                 <div className="min-w-0 rounded-2xl border border-white/20 bg-white/[0.08] px-5 py-5 md:px-6 md:py-6">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-300/45 bg-sky-300/10 text-base font-bold text-sky-200">02</span>
-                    <span className="text-sm font-bold uppercase tracking-wide text-sky-200">Step 2</span>
+                    <span className="text-sm font-bold uppercase tracking-wide text-sky-200">Choose one model</span>
                   </div>
                   <p className="text-base leading-7 text-slate-100">Select <strong>“Choose this model”</strong> on the best-fitting card.</p>
                 </div>
                 <div className="min-w-0 rounded-2xl border border-white/20 bg-white/[0.08] px-5 py-5 md:px-6 md:py-6">
                   <div className="mb-4 flex items-center gap-3">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-300/45 bg-sky-300/10 text-base font-bold text-sky-200">03</span>
-                    <span className="text-sm font-bold uppercase tracking-wide text-sky-200">Step 3</span>
+                    <span className="text-sm font-bold uppercase tracking-wide text-sky-200">Continue to the next step</span>
                   </div>
                   <p className="text-base leading-7 text-slate-100">Once you are ready, use the blue button below to continue.</p>
                 </div>
