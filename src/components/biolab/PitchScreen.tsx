@@ -23,7 +23,9 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
   ];
 
   const completedItems = canvasPreview.filter((item) => item.value && item.value.trim().length > 0).length;
-  const pitchIsReady = activeTeam.pitchTitle.trim().length > 0 && activeTeam.pitchSummary.trim().length > 0;
+  const titleReady = activeTeam.pitchTitle.trim().length >= 10;
+  const summaryReady = activeTeam.pitchSummary.trim().length >= 120;
+  const pitchIsReady = titleReady && summaryReady;
   const nextIncompleteTeamIndex = teams.findIndex((team, index) => index !== activeTeamIndex && !isPitchComplete(team));
   const hasAnotherTeamToComplete = nextIncompleteTeamIndex >= 0;
 
@@ -42,6 +44,9 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
     .filter(Boolean)
     .join(". ");
 
+  const draftPitch = () => {
+    if (!activeTeam.pitchSummary.trim()) updatePitch(activeTeam.pitchTitle, suggestedPitch);
+  };
   return (
     <div className="min-h-screen flex flex-col py-20 biolab-grid-pattern">
       <div className="biolab-container">
@@ -54,7 +59,7 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
             <span className="biolab-phase mb-4 inline-flex">Phase 06 — Pitch preparation</span>
             <h2 className="biolab-section-title mb-3">Now prepare how you will present the proposal</h2>
             <p className="biolab-subtitle max-w-3xl">
-              This is <strong>step 6</strong>. You are no longer designing: <strong>you are summarising your idea</strong> so that you can present it in 60 seconds and then put it to a vote.
+              To reach <strong>step 7: Review</strong>, complete <strong>two fields</strong>: a proposal name and a pitch of at least 120 characters that you can deliver in about 60 seconds. The button at the bottom will then unlock.
             </p>
           </div>
 
@@ -94,9 +99,9 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <span className="biolab-label block mb-2">Recommended order</span>
                   <ul className="space-y-2 text-sm md:text-base text-slate-200/85 leading-7">
-                    <li>• Give the idea a <strong>simple, technical name</strong>.</li>
-                    <li>• Use the summary on the left to draft the pitch.</li>
-                    <li>• Once it is clear, press the yellow button to move on to <strong>voting</strong>.</li>
+                    <li>• <strong>1.</strong> Write a technical proposal title (at least 10 characters).</li>
+                    <li>• <strong>2.</strong> Write a summary including the problem, natural mechanism, solution and first test (at least 120 characters). You can generate an editable draft from your canvas and then improve it.</li>
+                    <li>• <strong>3.</strong> When both fields are complete, select <strong>“Go to step 7: review proposals”</strong>. If other teams are still working, prepare their pitches first.</li>
                   </ul>
                 </div>
               </div>
@@ -166,7 +171,7 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
                 type="text"
                 value={activeTeam.pitchTitle}
                 onChange={(e) => updatePitch(e.target.value, activeTeam.pitchSummary)}
-                placeholder="Example: Passive cabin ventilation inspired by termite mounds"
+                placeholder={`Example: Solution to ${challenge?.title?.toLowerCase() ?? "your chosen challenge"} inspired by ${organism?.name?.toLowerCase() ?? "nature"}`}
                 className="biolab-input text-lg font-display font-semibold"
               />
             </motion.div>
@@ -179,10 +184,18 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
               <textarea
                 value={activeTeam.pitchSummary}
                 onChange={(e) => updatePitch(activeTeam.pitchTitle, e.target.value)}
-                placeholder={suggestedPitch || "Example: We identified a cabin ventilation problem that calls for greater efficiency and comfort. We drew inspiration from termite mounds, which regulate temperature and airflow through passive circulation. We propose applying that principle to an Airbus ventilation architecture with optimised inlets and outlets. This could reduce energy demand and improve heat distribution. The next step would be to validate the concept through simulation and a prototype."}
+                placeholder="In your own words, explain the problem, the natural mechanism, your solution, the expected benefit and how you would test the idea."
                 rows={8}
-                className="biolab-input resize-none text-sm leading-relaxed"
+                className="biolab-input resize-y text-base leading-relaxed"
               />
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button type="button" className="biolab-btn-ghost border border-primary/25" disabled={Boolean(activeTeam.pitchSummary.trim())}
+                  onClick={draftPitch}>Create an editable draft from my six answers</button>
+                <p className="text-sm text-muted-foreground">
+                  This button only assembles <strong>what your team has already written</strong>.
+                  It does not replace technical review.
+                </p>
+              </div>
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="biolab-card-dark py-5 px-5">
@@ -201,13 +214,19 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
           </div>
         </div>
 
+        <section className="max-w-6xl mx-auto mb-5 rounded-2xl border border-primary/20 bg-white p-5" aria-label="Requirements to continue">
+          <h3 className="text-lg font-bold mb-2">What do you need to reach step 7?</h3>
+          <p className="text-base leading-7">{titleReady?"✓":"○"} Proposal title: {titleReady?"ready":"write at least 10 characters"}.</p>
+          <p className="text-base leading-7">{summaryReady?"✓":"○"} 60-second pitch: {summaryReady?"ready for review":`${Math.max(0,120-activeTeam.pitchSummary.trim().length)} more characters needed`}.</p>
+          <p className="text-sm text-muted-foreground mt-2">Character counts do not measure technical quality. Check your reasoning before proceeding.</p>
+        </section>
         <div className="flex justify-center gap-4 flex-wrap">
           <button onClick={onBack} className="biolab-btn-ghost">← Back to the canvas</button>
-          <button onClick={continueRoute} className="biolab-btn-accent" disabled={!pitchIsReady} title={!pitchIsReady ? "Add a proposal name and a pitch to continue" : undefined}>
-            {hasAnotherTeamToComplete ? `Continue with ${teams[nextIncompleteTeamIndex].name}` : "Go to step 7: open review"}
+          <button onClick={continueRoute} className="biolab-btn-accent" disabled={!pitchIsReady} title={!pitchIsReady ? "Complete the title and pitch requirements shown above." : undefined}>
+            {hasAnotherTeamToComplete ? `Continue with ${teams[nextIncompleteTeamIndex].name}` : "Go to step 7: review proposals"}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
           </button>
-          {!pitchIsReady && <p className="w-full text-center text-xs text-muted-foreground">Add both a proposal name and a 60-second pitch to continue.</p>}
+          {!pitchIsReady && <p className="w-full text-center text-xs text-muted-foreground">Complete both fields to unlock the next step. You will then review the proposal.</p>}
           {pitchIsReady && hasAnotherTeamToComplete && <p className="w-full text-center text-xs text-muted-foreground">All teams complete the same route before group review is unlocked.</p>}
         </div>
       </div>
