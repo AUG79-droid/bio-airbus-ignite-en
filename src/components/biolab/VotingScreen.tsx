@@ -80,7 +80,7 @@ export default function VotingScreen({ onNext, onBack }: VotingScreenProps) {
           <div className="flex justify-center gap-4">
             <button onClick={onBack} className="biolab-btn-ghost">← Back to the pitch</button>
             <button onClick={onNext} className="biolab-btn-primary">
-              Go to step 8: view session summary
+              See results and compare with a reference
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
             </button>
           </div>
@@ -97,7 +97,7 @@ export default function VotingScreen({ onNext, onBack }: VotingScreenProps) {
             <span className="biolab-phase mb-5 inline-flex">Phase 07 — Voting</span>
             <h2 className="biolab-section-title mb-3">Now choose the most promising proposal</h2>
             <p className="biolab-subtitle max-w-3xl">
-              This is not an exam. Compare the proposals and decide which seems the most <strong>robust</strong>, <strong>original</strong> and <strong>useful to Airbus</strong>.
+              Compare the proposals and vote for the one with the strongest technical reasoning. At the end, every team can compare all six answers with a <strong>complete reference example for its challenge</strong>.
             </p>
           </div>
 
