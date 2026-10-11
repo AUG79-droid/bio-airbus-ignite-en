@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { TeamData, Challenge, Organism, createTeam, CanvasData } from "@/data/biolab-data";
+import { TeamData, Challenge, Organism, createTeam, CanvasData, isCanvasEntryReady } from "@/data/biolab-data";
 
 const STORAGE_KEY = "bio-airbus-ignite-en-v2";
 
@@ -27,6 +27,8 @@ interface BioLabState extends StoredSession {
   canAccessScreen: (screen: number) => boolean;
   maxAccessibleScreen: number;
   activeTeam: TeamData | undefined;
+  guideSubstep: number;
+  setGuideSubstep: (step: number) => void;
   isCanvasComplete: (team?: TeamData) => boolean;
   isPitchComplete: (team?: TeamData) => boolean;
 }
@@ -57,11 +59,11 @@ function loadStoredSession(): StoredSession {
 }
 
 function canvasIsComplete(team?: TeamData) {
-  return Boolean(team && Object.values(team.canvas).every((value) => value.trim().length > 0));
+  return Boolean(team && (Object.entries(team.canvas) as [keyof CanvasData, string][]).every(([key, value]) => isCanvasEntryReady(key, value)));
 }
 
 function pitchIsComplete(team?: TeamData) {
-  return Boolean(team?.pitchTitle.trim() && team?.pitchSummary.trim());
+  return Boolean(team && team.pitchTitle.trim().length >= 10 && team.pitchSummary.trim().length >= 120);
 }
 
 function getMaxAccessibleScreen(team?: TeamData, allTeams: TeamData[] = [], reviewCompleted = false) {
@@ -88,6 +90,7 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
   const [teams, setTeams] = useState<TeamData[]>(initialSession.teams);
   const [activeTeamIndex, setActiveTeamIndex] = useState(initialSession.activeTeamIndex);
   const [reviewCompleted, setReviewCompleted] = useState(initialSession.reviewCompleted);
+  const [guideSubstep, setGuideSubstep] = useState(0);
 
   const activeTeam = teams[activeTeamIndex];
   const maxAccessibleScreen = useMemo(
@@ -183,6 +186,7 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
     setTeams([]);
     setActiveTeamIndex(0);
     setReviewCompleted(false);
+    setGuideSubstep(0);
   };
 
   return (
@@ -208,6 +212,8 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
         canAccessScreen: (screen) => screen <= 2 || screen <= maxAccessibleScreen,
         maxAccessibleScreen,
         activeTeam,
+        guideSubstep,
+        setGuideSubstep,
         isCanvasComplete: canvasIsComplete,
         isPitchComplete: pitchIsComplete,
       }}
