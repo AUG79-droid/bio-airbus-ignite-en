@@ -155,7 +155,7 @@ export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
             <div className="flex items-start justify-between gap-5 mb-6">
               <div>
                 <span className="biolab-label block mb-2">Information entered</span>
-                <h3 className="text-2xl font-display font-bold text-foreground">{readiness}/4 evidence gates</h3>
+                <h3 className="text-2xl font-display font-bold text-foreground">{readiness}/4 fields with text</h3>
               </div>
               <div className="h-14 w-14 rounded-2xl grid place-items-center bg-primary/8 text-primary"><ShieldCheck className="h-7 w-7" /></div>
             </div>
