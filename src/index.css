@@ -618,3 +618,57 @@
     print-color-adjust: exact;
   }
 }
+
+/* Accessible application header: avoid shrinking the logo and navigation to unreadable text. */
+.biolab-topbar .biolab-container { max-width: none; width: 100%; padding-left: clamp(12px, 2vw, 32px); padding-right: clamp(12px, 2vw, 32px); }
+.biolab-topbar .biolab-route-step { font-size: 14px; padding: 10px 8px; gap: 8px; white-space: nowrap; }
+.biolab-topbar .biolab-route-dot { width: 27px; height: 27px; font-size: 12px; flex-shrink: 0; }
+.biolab-topbar .biolab-nav-select { font-size: 16px; min-height: 44px; }
+.biolab-topbar .biolab-team-select { font-size: 15px; min-height: 44px; }
+.biolab-topbar .biolab-icon-btn { width: 44px; height: 44px; }
+.biolab-topbar button:focus-visible,.biolab-topbar select:focus-visible { outline: 3px solid hsl(var(--primary)); outline-offset: 2px; }
+.biolab-card-dark .biolab-label { color: #e2e8f0; opacity: 1; }
+@media (max-width: 640px) { .biolab-topbar .biolab-container { gap: 7px; } }
+
+/* Floating BIO-LAB guide — persistent on every screen and minimizable. */
+.biolab-guide {
+  position: fixed; z-index: 90; right: 18px; bottom: 18px; width: min(355px, calc(100vw - 28px));
+  color: #f8fafc; filter: drop-shadow(0 12px 27px rgba(7,24,44,.35));
+}
+.biolab-guide-card {
+  border-radius: 20px; background: linear-gradient(155deg, #0c2037, #102c45 78%, #0e273e);
+  border: 1px solid #4481b7; box-shadow: 0 14px 38px rgba(4,14,30,.36);
+  overflow: hidden; padding: 13px 14px 10px;
+}
+.biolab-guide-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 7px; }
+.biolab-guide-top h2 { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.25; margin-top: 2px; }
+.biolab-guide-eyebrow { font-size: 11px; font-weight: 800; color: #82d8ff; letter-spacing: .07em; }
+.biolab-guide-minimize { background: #25435c; border: 1px solid #4c6d87; padding: 7px; border-radius: 10px; color: white; flex-shrink: 0; }
+.biolab-guide-minimize:hover, .biolab-guide-reopen:hover { background: #245b82; }
+.biolab-guide-body { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.biolab-guide-avatar { width: 99px; height: 129px; object-fit: contain; object-position: bottom; flex-shrink: 0; filter: drop-shadow(0 7px 12px #030a12); }
+.biolab-guide-avatar.is-speaking { animation: biolab-guide-nod .62s ease-in-out infinite alternate; }
+@keyframes biolab-guide-nod { to { transform: translateY(-3px) rotate(-2deg); } }
+.biolab-guide-content { flex: 1; min-width: 0; max-height: 180px; overflow-y: auto; }
+.biolab-guide-stage { color: #80d8fb; font-size: 13px; font-weight: 800; margin: 0 0 5px; line-height: 1.35; }
+.biolab-guide-message { color: #eff6fc; line-height: 1.45; font-size: 13px; white-space: normal; margin: 0; }
+.biolab-guide-actions { display: flex; gap: 8px; margin-top: 9px; }
+.biolab-guide-actions button { display: flex; align-items: center; justify-content: center; gap: 7px; flex: 1; min-width: 0; border-radius: 11px; border: 1px solid #5788a9; color: white; font-size: 14px; font-weight: 750; background: #173955; padding: 9px 8px; }
+.biolab-guide-actions button:hover { background: #1d547a; }
+.biolab-guide-actions button:focus-visible, .biolab-guide-minimize:focus-visible,.biolab-guide-reopen:focus-visible { outline: 3px solid #8adfff; outline-offset: 2px; }
+.biolab-guide-actions button[aria-pressed="true"] { border-color: #f7c65d; }
+.biolab-guide-note { font-size: 11px; color: #bed8ed; margin-top: 7px; }
+.biolab-guide-error { font-size: 12px; color: #ffcf80; padding-top: 6px; }
+.biolab-guide-reopen { width: auto; min-height: 62px; margin-left: auto; display: flex; align-items: center; gap: 10px; padding: 5px 12px 5px 5px; border: 1px solid #4b88b6; background: #0e263e; border-radius: 15px; font-weight: 800; font-size: 15px; color: white; }
+.biolab-guide-reopen img { width: 49px; height: 53px; object-fit: contain; }
+.biolab-guide-reopen span { display: flex; gap: 7px; align-items: center; }
+@media (max-width: 700px) {
+  .biolab-guide { width: min(310px, calc(100vw - 16px)); bottom: 8px; right: 8px; }
+  .biolab-guide-card { padding: 10px; }
+  .biolab-guide-avatar { width: 72px; height: 96px; }
+  .biolab-guide-content { max-height: 113px; }
+  .biolab-guide-message { font-size: 12px; }
+  .biolab-guide-actions button { font-size: 13px; }
+  .biolab-guide-top h2 { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .biolab-guide-avatar.is-speaking { animation: none; } }
