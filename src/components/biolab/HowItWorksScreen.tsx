@@ -86,6 +86,16 @@ export default function HowItWorksScreen({ onNext, onBack }: HowItWorksScreenPro
           </div>
         </motion.section>
 
+        <section className="max-w-5xl mx-auto biolab-card mb-8">
+          <h3 className="text-xl font-bold mb-3">Worked example: ventilation inspired by termite mounds</h3>
+          <p className="text-base leading-7 mb-3">Problem: study pressure losses in a cabin ventilation duct without affecting required airflow or safety.</p>
+          <p className="text-base leading-7 mb-3">Nature: termite mound passages suggest how geometry and temperature gradients influence air movement.</p>
+          <p className="text-base leading-7 mb-3">Principle: use channel geometry to guide airflow and influence pressure loss.</p>
+          <p className="text-base leading-7 mb-3">Proposal: test alternative duct geometry within an active, controlled aircraft environmental system.</p>
+          <p className="text-base leading-7 mb-3">Expected benefit: investigate lower pressure loss at equivalent airflow; no energy saving is assumed.</p>
+          <p className="text-base leading-7 mb-3">First test: compare a reference duct and a proposed geometry using flow simulation and representative tests.</p>
+          <p className="text-base leading-7 font-semibold">This is only a learning example, not an approved or technically validated design.</p>
+        </section>
         <div className="max-w-3xl mx-auto rounded-2xl border border-primary/15 bg-primary/5 p-5 mb-12">
           <h3 className="text-base font-semibold text-foreground mb-2">Expected outcome</h3>
           <p className="text-sm leading-7 text-muted-foreground">
