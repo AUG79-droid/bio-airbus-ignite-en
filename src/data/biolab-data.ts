@@ -199,6 +199,24 @@ export const STEPS = [
   { number: 6, title: "Pitch and vote", description: "Present your idea and vote for the strongest proposals" },
 ];
 
+export const MIN_CANVAS_CHARS = 30;
+/** Check whether a field contains a retained auto-filled sample from the old English edition. */
+const LEGACY_EXAMPLE_MARKERS: Record<keyof CanvasData, string> = {
+  problem: "The team wants to address ",
+  organism: "This is a useful reference because",
+  principle: "We are not copying the organism's shape",
+  solution: "The idea is to design a technical proposal inspired by",
+  benefit: "The expected impact is to improve performance",
+  implementation: "A reasonable next step would be",
+};
+export function isLegacyCanvasExample(key: keyof CanvasData, text: string): boolean {
+  const t = text.trim();
+  return Boolean(t && (t.includes(LEGACY_EXAMPLE_MARKERS[key]) || t.startsWith(LEGACY_EXAMPLE_MARKERS[key])));
+}
+export function isCanvasEntryReady(key: keyof CanvasData, text: string): boolean {
+  return text.trim().length >= MIN_CANVAS_CHARS && !isLegacyCanvasExample(key, text);
+}
+
 export function createEmptyCanvas(): CanvasData {
   return {
     problem: "",
