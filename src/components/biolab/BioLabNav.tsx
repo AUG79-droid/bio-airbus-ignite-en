@@ -45,24 +45,25 @@ export default function BioLabNav() {
       className="biolab-topbar print:hidden"
       aria-label="Learning route"
     >
-      <div className="biolab-container h-16 flex items-center gap-4">
-        <button onClick={() => setScreen(1)} className="group flex min-w-0 items-center gap-3 text-left">
+      <div className="biolab-container min-h-20 flex items-center gap-3">
+        <button onClick={() => setScreen(1)} className="group flex shrink-0 max-w-[270px] min-w-0 items-center gap-3 text-left">
           <div className="h-9 w-9 shrink-0 rounded-xl bg-primary text-primary-foreground grid place-items-center font-display text-xs font-black shadow-sm">
             BI
           </div>
           <div className="hidden sm:block min-w-0">
-            <span className="block truncate text-sm font-bold font-display text-foreground group-hover:text-primary transition-colors">
+            <span className="block text-base font-bold font-display text-foreground leading-snug group-hover:text-primary transition-colors">
               Bio-Inspired Innovation Lab
             </span>
-            <span className="block text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+            <span className="block text-xs uppercase tracking-wide leading-snug text-slate-600">
               Airbus-context simulation
             </span>
           </div>
         </button>
 
-        <div className="hidden xl:flex items-center gap-1 flex-1 justify-center">
+        <div className="hidden min-[1780px]:flex items-center gap-1 flex-1 justify-center">
           {SCREEN_LABELS.slice(1).map((label, index) => {
             const screenIndex = index + 1;
+            const stageLabel = screenIndex >= 2 && screenIndex <= 7 ? String(screenIndex - 1) : screenIndex === 1 ? "i" : screenIndex === 8 ? "R" : "F";
             const isActive = currentScreen === screenIndex;
             const isPast = currentScreen > screenIndex;
             const isAvailable = canAccessScreen(screenIndex);
@@ -77,7 +78,7 @@ export default function BioLabNav() {
                 className={`biolab-route-step ${isActive ? "is-active" : ""} ${isPast ? "is-past" : ""}`}
               >
                 <span className="biolab-route-dot">
-                  {isPast ? <Check className="h-3 w-3" strokeWidth={3} /> : !isAvailable ? <LockKeyhole className="h-3 w-3" /> : screenIndex}
+                  {isPast ? <Check className="h-3 w-3" strokeWidth={3} /> : !isAvailable ? <LockKeyhole className="h-3 w-3" /> : stageLabel}
                 </span>
                 <span>{label}</span>
               </button>
@@ -85,7 +86,7 @@ export default function BioLabNav() {
           })}
         </div>
 
-        <div className="relative xl:hidden flex-1 max-w-[230px]">
+        <div className="relative min-[1780px]:hidden flex-1 max-w-[290px]">
           <select
             value={currentScreen}
             onChange={(event) => setScreen(Number(event.target.value))}
@@ -94,9 +95,10 @@ export default function BioLabNav() {
           >
             {SCREEN_LABELS.slice(1).map((label, index) => {
               const screenIndex = index + 1;
+              const stageLabel = screenIndex >= 2 && screenIndex <= 7 ? String(screenIndex - 1) + ". " : "";
               return (
                 <option key={label} value={screenIndex} disabled={!canAccessScreen(screenIndex)}>
-                  {screenIndex}. {label}{!canAccessScreen(screenIndex) ? " — locked" : ""}
+                  {stageLabel}{label}{!canAccessScreen(screenIndex) ? " — locked" : ""}
                 </option>
               );
             })}
@@ -105,7 +107,7 @@ export default function BioLabNav() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground" title="Progress is saved on this device">
+          <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-700" title="Progress is saved on this device">
             <Save className="h-3.5 w-3.5 text-success" />
             Saved locally
           </div>
@@ -131,8 +133,8 @@ export default function BioLabNav() {
             <RotateCcw className="h-4 w-4" />
           </button>
 
-          <div className="hidden lg:block w-20" aria-label={`${completedStages} stages completed`}>
-            <div className="flex justify-between mb-1 text-[9px] font-mono text-muted-foreground">
+          <div className="hidden lg:block w-28" aria-label={`${completedStages} stages completed`}>
+            <div className="flex justify-between mb-1 text-xs font-mono text-slate-700">
               <span>PROGRESS</span><span>{Math.round(progress)}%</span>
             </div>
             <div className="h-1.5 rounded-full overflow-hidden bg-muted">
