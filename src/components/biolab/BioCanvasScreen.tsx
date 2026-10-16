@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
 import { CanvasData, isCanvasEntryReady, isLegacyCanvasExample, MIN_CANVAS_CHARS } from "@/data/biolab-data";
@@ -37,17 +37,12 @@ const GUIDES: FieldGuide[] = [
 
 export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
   const {activeTeam,updateCanvas,setScreen,setGuideSubstep}=useBioLab();
-  const [activeIndex,setActiveIndex]=useState(0);
-  useEffect(()=>setGuideSubstep(activeIndex),[activeIndex,setGuideSubstep]);
+  useEffect(()=>setGuideSubstep(0),[setGuideSubstep]);
   if(!activeTeam) return null;
   const challenge=activeTeam.challenge;
   const organism=activeTeam.organism;
-  const current=GUIDES[activeIndex];
-  const answer=activeTeam.canvas[current.key];
   const count=GUIDES.filter(g=>isCanvasEntryReady(g.key,activeTeam.canvas[g.key])).length;
   const canContinue=count===GUIDES.length;
-  const isLegacy=isLegacyCanvasExample(current.key,answer);
-  const isReady=isCanvasEntryReady(current.key,answer);
   const mismatch=challenge?.id==="c7" && organism?.id==="o4";
 
   return (
@@ -58,7 +53,7 @@ export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
           <h1 className="biolab-section-title mb-3">Now build your own proposal</h1>
           <p className="biolab-subtitle max-w-4xl">
             Your task is to explain <strong>how a natural strategy might solve a real Airbus-context challenge</strong>.
-            Complete six sections, one at a time, in your own words. The app does not supply a ready-made answer.
+            Complete the six clearly labelled answers below, in your own words. The app does not supply a ready-made answer.
           </p>
         </motion.header>
         <section className="max-w-6xl mx-auto biolab-card-dark mb-6" aria-label="Canvas instructions">
@@ -110,54 +105,61 @@ export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
         <section className="max-w-6xl mx-auto biolab-card mb-6" aria-label="Proposal canvas editor">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-5">
             <div>
-              <h2 className="text-xl font-display font-bold">Your proposal: section {activeIndex+1} of 6</h2>
+              <h2 className="text-xl md:text-2xl font-display font-bold">Your proposal · 6 answers</h2>
               <p className="text-sm md:text-base text-muted-foreground">
-                {count} of 6 sections contain sufficient original text. You can return and edit any answer.
+                Answer every question below. All six sections remain visible so you can review and edit the complete proposal.
               </p>
             </div>
-            <div aria-live="polite" className="text-base font-semibold text-primary">{count}/6 written</div>
-          </div>
-          <nav className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-7" aria-label="Canvas sections">
-            {GUIDES.map((g,index)=>{
-              const ready=isCanvasEntryReady(g.key,activeTeam.canvas[g.key]);
-              return <button key={g.key} type="button" onClick={()=>setActiveIndex(index)}
-                aria-current={index===activeIndex?"step":undefined}
-                className={`rounded-xl border p-3 text-left text-sm md:text-base font-semibold transition-colors ${index===activeIndex?"bg-primary text-primary-foreground border-primary":"bg-background border-border hover:border-primary/40 text-foreground"}`}>
-                <span className="block text-xs mb-1">{String(index+1).padStart(2,"0")} · {ready?"✓ Written":"Pending"}</span>{g.short}
-              </button>;
-            })}
-          </nav>
-          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 md:p-7">
-            <span className="biolab-label block mb-2">Section {String(activeIndex+1).padStart(2,"0")}</span>
-            <h3 className="text-2xl font-bold font-display mb-3">{current.title}</h3>
-            <p className="text-lg md:text-xl font-semibold mb-3">{current.question}</p>
-            <p className="text-base text-muted-foreground leading-7 mb-5">{current.explain}</p>
-            <details className="rounded-xl border border-border bg-card p-4 mb-5">
-              <summary className="cursor-pointer text-base font-semibold text-primary">Thinking prompts</summary>
-              <ul className="mt-3 pl-5 list-disc space-y-2 text-base text-foreground leading-7">
-                {current.thinkAbout.map(item=><li key={item}>{item}</li>)}
-              </ul>
-            </details>
-            <label htmlFor={`canvas-${current.key}`} className="block font-semibold text-base mb-2">Your answer (write it here):</label>
-            <textarea id={`canvas-${current.key}`} value={answer}
-              onChange={event=>updateCanvas(current.key,event.target.value)}
-              placeholder={current.placeholder} rows={7}
-              className="biolab-input resize-y text-base md:text-lg leading-relaxed min-h-[180px] bg-white"/>
-            {isLegacy&&<p className="mt-3 rounded-lg border border-amber-400 bg-amber-100 px-4 py-3 text-base text-amber-950" role="status">
-              This field still contains a previously inserted sample answer. We have kept it, but <strong>you need to rewrite
-              it in your own words</strong> to count this section as written.
-            </p>}
-            <div className="flex flex-wrap justify-between gap-3 mt-3 text-sm md:text-base">
-              <span className="text-muted-foreground" aria-live="polite">
-                {isReady?"✓ Text entered. Review its technical quality before continuing.":isLegacy?"Rewrite the old sample to continue":
-                  `Write at least ${MIN_CANVAS_CHARS} characters to register this section.`}
-              </span>
-              <span className="text-muted-foreground">{answer.trim().length} characters</span>
+            <div aria-live="polite" className="shrink-0 rounded-full bg-primary/10 px-4 py-2 text-base font-bold text-primary">
+              {count}/6 written
             </div>
           </div>
-          <div className="mt-6 flex items-center justify-between gap-3 flex-wrap">
-            <button type="button" className="biolab-btn-ghost" disabled={activeIndex===0} onClick={()=>setActiveIndex(n=>Math.max(0,n-1))}>← Previous section</button>
-            <button type="button" className="biolab-btn-primary" disabled={activeIndex===GUIDES.length-1} onClick={()=>setActiveIndex(n=>Math.min(GUIDES.length-1,n+1))}>Next section →</button>
+          <div className="space-y-5">
+            {GUIDES.map((guide,index)=>{
+              const answer=activeTeam.canvas[guide.key];
+              const isLegacy=isLegacyCanvasExample(guide.key,answer);
+              const isReady=isCanvasEntryReady(guide.key,answer);
+              return (
+                <article key={guide.key} className={`rounded-2xl border-2 p-5 md:p-7 transition-colors ${isReady?"border-emerald-300 bg-emerald-50/40":"border-primary/20 bg-primary/5"}`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                    <div>
+                      <span className="biolab-label block mb-2">Answer {String(index+1).padStart(2,"0")} of 06 · {guide.short}</span>
+                      <h3 className="text-xl md:text-2xl font-bold font-display">{guide.title}</h3>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-sm font-bold ${isReady?"bg-emerald-100 text-emerald-800":"bg-white text-muted-foreground border border-border"}`}>
+                      {isReady?"✓ Written":"Pending"}
+                    </span>
+                  </div>
+                  <label htmlFor={`canvas-${guide.key}`} className="block text-lg md:text-xl font-semibold mb-3">
+                    {guide.question}
+                  </label>
+                  <p className="text-base text-muted-foreground leading-7 mb-4">{guide.explain}</p>
+                  <details className="rounded-xl border border-border bg-white p-4 mb-4">
+                    <summary className="cursor-pointer text-base font-semibold text-primary">Need help? View thinking prompts</summary>
+                    <ul className="mt-3 pl-5 list-disc space-y-2 text-base text-foreground leading-7">
+                      {guide.thinkAbout.map(item=><li key={item}>{item}</li>)}
+                    </ul>
+                  </details>
+                  <textarea id={`canvas-${guide.key}`} value={answer}
+                    aria-label={`${index+1} of 6: ${guide.question}`}
+                    onFocus={()=>setGuideSubstep(index)}
+                    onChange={event=>updateCanvas(guide.key,event.target.value)}
+                    placeholder={guide.placeholder} rows={5}
+                    className="biolab-input resize-y text-base md:text-lg leading-relaxed min-h-[140px] bg-white"/>
+                  {isLegacy&&<p className="mt-3 rounded-lg border border-amber-400 bg-amber-100 px-4 py-3 text-base text-amber-950" role="status">
+                    This field still contains a previously inserted sample answer. We have kept it, but <strong>you need to rewrite
+                    it in your own words</strong> to count this section as written.
+                  </p>}
+                  <div className="flex flex-wrap justify-between gap-3 mt-3 text-sm md:text-base">
+                    <span className="text-muted-foreground" aria-live="polite">
+                      {isReady?"✓ Text entered. Review its technical quality.":isLegacy?"Rewrite the old sample to continue":
+                        `Write at least ${MIN_CANVAS_CHARS} characters to register this answer.`}
+                    </span>
+                    <span className="text-muted-foreground">{answer.trim().length} characters</span>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
         <section className="max-w-6xl mx-auto rounded-2xl border border-border bg-white px-5 py-5 mb-7">

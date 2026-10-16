@@ -8,7 +8,7 @@ function Harness() {
   const lab = useBioLab();
   const completeCanvas = () => {
     (["problem", "organism", "principle", "solution", "benefit", "implementation"] as const)
-      .forEach((field) => lab.updateCanvas(field, `Completed ${field}`));
+      .forEach((field) => lab.updateCanvas(field, `Completed original ${field} answer with enough technical detail.`));
   };
 
   return (
@@ -20,7 +20,10 @@ function Harness() {
       <button onClick={() => lab.setTeamChallenge(CHALLENGES[0])}>set challenge</button>
       <button onClick={() => lab.setTeamOrganism(ORGANISMS[0])}>set organism</button>
       <button onClick={completeCanvas}>complete canvas</button>
-      <button onClick={() => lab.updatePitch("Bionic structure", "A testable bio-inspired proposal.")}>complete pitch</button>
+      <button onClick={() => lab.updatePitch(
+        "Bionic structure",
+        "A testable bio-inspired proposal with a defined mechanism, baseline, technical comparison, safety constraints and measurable success criterion.",
+      )}>complete pitch</button>
       <button onClick={() => lab.setScreen(8)}>open review</button>
       <button onClick={lab.nextScreen}>finish review</button>
     </div>
