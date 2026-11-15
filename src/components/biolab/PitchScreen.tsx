@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
+import { isCanvasEntryReady, isObviousFillerText, isPitchTitleReady, isPitchSummaryReady } from "@/data/biolab-data";
 
 interface PitchScreenProps {
   onNext: () => void;
@@ -18,13 +19,16 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
     { label: "Airbus challenge", value: challenge?.title },
     { label: "Natural model", value: organism?.name },
     { label: "Principle", value: organism?.principle },
-    { label: "Proposed solution", value: canvas.solution },
-    { label: "Expected impact", value: canvas.benefit },
+    { label: "Proposed solution", value: isCanvasEntryReady("solution", canvas.solution) ? canvas.solution : undefined },
+    { label: "Expected impact", value: isCanvasEntryReady("benefit", canvas.benefit) ? canvas.benefit : undefined },
   ];
 
   const completedItems = canvasPreview.filter((item) => item.value && item.value.trim().length > 0).length;
-  const titleReady = activeTeam.pitchTitle.trim().length >= 10;
-  const summaryReady = activeTeam.pitchSummary.trim().length >= 120;
+  const hasInvalidPreview = (["solution", "benefit"] as const).some(
+    (field) => canvas[field].trim().length > 0 && !isCanvasEntryReady(field, canvas[field]),
+  );
+  const titleReady = isPitchTitleReady(activeTeam.pitchTitle);
+  const summaryReady = isPitchSummaryReady(activeTeam.pitchSummary);
   const pitchIsReady = titleReady && summaryReady;
   const nextIncompleteTeamIndex = teams.findIndex((team, index) => index !== activeTeamIndex && !isPitchComplete(team));
   const hasAnotherTeamToComplete = nextIncompleteTeamIndex >= 0;
@@ -135,10 +139,15 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
             <div className="biolab-card">
               <h3 className="biolab-label mb-4">Presentation-ready summary</h3>
               <div className="space-y-4">
+                {hasInvalidPreview && (
+                  <p role="status" className="rounded-xl border border-amber-400 bg-amber-50 px-3 py-2 text-sm text-amber-950 break-words">
+                    Some answers contain test text or are incomplete. Correct them in the Canvas before presenting.
+                  </p>
+                )}
                 {canvasPreview.map((item) => (
                   <div key={item.label}>
                     <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/70">{item.label}</span>
-                    <p className="text-sm text-foreground mt-1 leading-relaxed">{item.value || "Not completed yet"}</p>
+                    <p className="text-sm text-foreground mt-1 leading-relaxed break-words" style={{ overflowWrap: "anywhere" }}>{item.value || "Complete or correct this answer in the Canvas"}</p>
                   </div>
                 ))}
               </div>
@@ -216,8 +225,8 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
 
         <section className="max-w-6xl mx-auto mb-5 rounded-2xl border border-primary/20 bg-white p-5" aria-label="Requirements to continue">
           <h3 className="text-lg font-bold mb-2">What do you need to reach step 7?</h3>
-          <p className="text-base leading-7">{titleReady?"✓":"○"} Proposal title: {titleReady?"ready":"write at least 10 characters"}.</p>
-          <p className="text-base leading-7">{summaryReady?"✓":"○"} 60-second pitch: {summaryReady?"ready for review":`${Math.max(0,120-activeTeam.pitchSummary.trim().length)} more characters needed`}.</p>
+          <p className="text-base leading-7">{titleReady?"✓":"○"} Proposal title: {titleReady?"ready":isObviousFillerText(activeTeam.pitchTitle)?"replace the test text":"write at least 10 characters"}.</p>
+          <p className="text-base leading-7">{summaryReady?"✓":"○"} 60-second pitch: {summaryReady?"ready for review":isObviousFillerText(activeTeam.pitchSummary)?"replace the test text":`${Math.max(0,120-activeTeam.pitchSummary.trim().length)} more characters needed`}.</p>
           <p className="text-sm text-muted-foreground mt-2">Character counts do not measure technical quality. Check your reasoning before proceeding.</p>
         </section>
         <div className="flex justify-center gap-4 flex-wrap">
