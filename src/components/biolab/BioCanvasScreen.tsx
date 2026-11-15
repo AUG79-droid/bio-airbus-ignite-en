@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
-import { CanvasData, isCanvasEntryReady, isLegacyCanvasExample, MIN_CANVAS_CHARS } from "@/data/biolab-data";
+import { CanvasData, isCanvasEntryReady, isLegacyCanvasExample, isObviousFillerText, MIN_CANVAS_CHARS } from "@/data/biolab-data";
 
 interface BioCanvasScreenProps { onNext: () => void; onBack: () => void; }
 type FieldGuide = {
@@ -118,9 +118,10 @@ export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
             {GUIDES.map((guide,index)=>{
               const answer=activeTeam.canvas[guide.key];
               const isLegacy=isLegacyCanvasExample(guide.key,answer);
+              const isFiller = isObviousFillerText(answer);
               const isReady=isCanvasEntryReady(guide.key,answer);
               return (
-                <article key={guide.key} className={`rounded-2xl border-2 p-5 md:p-7 transition-colors ${isReady?"border-emerald-300 bg-emerald-50/40":"border-primary/20 bg-primary/5"}`}>
+                <article key={guide.key} className={`rounded-2xl border-2 p-5 md:p-7 transition-colors ${isReady?"border-emerald-300 bg-emerald-50/40":isFiller?"border-amber-400 bg-amber-50":"border-primary/20 bg-primary/5"}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
                     <div>
                       <span className="biolab-label block mb-2">Answer {String(index+1).padStart(2,"0")} of 06 · {guide.short}</span>
@@ -141,6 +142,7 @@ export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
                     </ul>
                   </details>
                   <textarea id={`canvas-${guide.key}`} value={answer}
+                    aria-invalid={isFiller}
                     aria-label={`${index+1} of 6: ${guide.question}`}
                     onFocus={()=>setGuideSubstep(index)}
                     onChange={event=>updateCanvas(guide.key,event.target.value)}
@@ -152,7 +154,7 @@ export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
                   </p>}
                   <div className="flex flex-wrap justify-between gap-3 mt-3 text-sm md:text-base">
                     <span className="text-muted-foreground" aria-live="polite">
-                      {isReady?"✓ Text entered. Review its technical quality.":isLegacy?"Rewrite the old sample to continue":
+                      {isReady?"✓ Text entered. Review its technical quality.":isLegacy?"Rewrite the old sample to continue":isFiller?"Repeated or test text does not count as an answer. Write a meaningful explanation.":
                         `Write at least ${MIN_CANVAS_CHARS} characters to register this answer.`}
                     </span>
                     <span className="text-muted-foreground">{answer.trim().length} characters</span>
