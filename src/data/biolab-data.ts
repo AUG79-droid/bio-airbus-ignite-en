@@ -213,8 +213,32 @@ export function isLegacyCanvasExample(key: keyof CanvasData, text: string): bool
   const t = text.trim();
   return Boolean(t && (t.includes(LEGACY_EXAMPLE_MARKERS[key]) || t.startsWith(LEGACY_EXAMPLE_MARKERS[key])));
 }
+/**
+ * Catch obvious keyboard filler (e.g. ccccc..., abcabc..., or one repeated word).
+ * This is a minimal text-quality guard, NOT an assessment of technical validity.
+ */
+export function isObviousFillerText(text: string): boolean {
+  const value = text.trim();
+  if (!value) return false;
+  if (/([^\s])\1{9,}/u.test(value)) return true;
+  const letters = (value.match(/\p{L}/gu) ?? []).map((letter) => letter.toLocaleLowerCase());
+  if (letters.length >= 12 && new Set(letters).size < 4) return true;
+  const tokens = value.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
+  if (value.length >= 30 && tokens.length <= 1) return true;
+  if (tokens.length >= 6 && new Set(tokens).size <= 2) return true;
+  return false;
+}
+
+export function isPitchTitleReady(text: string): boolean {
+  return text.trim().length >= 10 && !isObviousFillerText(text);
+}
+
+export function isPitchSummaryReady(text: string): boolean {
+  return text.trim().length >= 120 && !isObviousFillerText(text);
+}
+
 export function isCanvasEntryReady(key: keyof CanvasData, text: string): boolean {
-  return text.trim().length >= MIN_CANVAS_CHARS && !isLegacyCanvasExample(key, text);
+  return text.trim().length >= MIN_CANVAS_CHARS && !isLegacyCanvasExample(key, text) && !isObviousFillerText(text);
 }
 
 export function createEmptyCanvas(): CanvasData {
