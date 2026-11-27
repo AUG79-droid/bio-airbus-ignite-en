@@ -1,3 +1,5 @@
+import { PilotAssessment } from "@/components/biolab/PilotAssessment";
+import { challengeTrack } from "@/data/resilience-expansion";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Clipboard, Printer, RotateCcw, ShieldCheck } from "lucide-react";
@@ -206,6 +208,7 @@ export default function ResultsScreen({ onRestart }: ResultsScreenProps) {
         )}
 
         <ReferenceComparison teams={sorted} />
+        {teams.map(team=>{const track=challengeTrack(team.challenge?.id);return track==="general"?null:<PilotAssessment key={team.id+track} teamId={team.id} track={track} phase="post" challengeId={team.challenge?.id}/>;})}
 
         <section className="max-w-6xl mx-auto biolab-callout mb-8">
           <strong>Responsible interpretation</strong>

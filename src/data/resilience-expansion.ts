@@ -237,7 +237,7 @@ export const expansionSources: Record<string,string> = {
   "c15": "https://pubmed.ncbi.nlm.nih.gov/31005607/",
   "r1": "https://pubmed.ncbi.nlm.nih.gov/20093467/",
   "r2": "https://pubmed.ncbi.nlm.nih.gov/31105211/",
-  "r3": "https://doi.org/10.1073/pnas.1008406108",
+  "r3": "https://pubmed.ncbi.nlm.nih.gov/22065759/",
   "r4": "https://doi.org/10.1038/35015073"
 };
 export const EXTRA_MODELS: Organism[] = [

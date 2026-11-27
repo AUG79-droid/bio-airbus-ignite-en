@@ -53,7 +53,7 @@ const screenSteps: Guidance[] = [
     instruction: "With one team, review the proposal and continue to the final result. With multiple teams, compare the proposals and vote. Then open Results.",
     tip: "The most popular concept is not necessarily technically viable. Assess the mechanism, constraints and proposed validation." },
   { title: "Results · Compare",
-    instruction: "You have reached the final step. Open your team's comparison to see its six answers beside a reasoned reference example for the same challenge. Identify differences and review the four learning criteria.",
+    instruction: "You have reached the final step. Open your team's comparison to see its six answers beside a reasoned reference example for the same challenge. Identify differences and review the learning criteria.",
     tip: "The reference is not the only possible solution and is not an approved technology. Identify missing evidence and the test that could validate your idea." },
 ];
 
