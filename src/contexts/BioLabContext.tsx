@@ -84,8 +84,17 @@ function getResumeScreen(team?: TeamData) {
   return 8;
 }
 
-export function BioLabProvider({ children }: { children: ReactNode }) {
-  const [initialSession] = useState(loadStoredSession);
+export function BioLabProvider({ children, workshop }: { children: ReactNode; workshop?: { storageKey:string; team:TeamData } }) {
+  const storageKey=workshop?.storageKey??STORAGE_KEY;
+  const [initialSession] = useState<StoredSession>(() => {
+    if(!workshop)return loadStoredSession();
+    const fallback={currentScreen:3,teams:[workshop.team],activeTeamIndex:0,reviewCompleted:false};
+    try{
+      const p=JSON.parse(localStorage.getItem(storageKey)??"null");
+      if(p?.teams?.length!==1||p.teams[0].id!==workshop.team.id||p.teams[0].challenge?.id!==workshop.team.challenge?.id)return fallback;
+      return {currentScreen:Math.max(3,Math.min(8,Number(p.currentScreen)||3)),teams:[{...p.teams[0],challenge:workshop.team.challenge}],activeTeamIndex:0,reviewCompleted:false};
+    }catch{return fallback;}
+  });
   const [currentScreen, setCurrentScreen] = useState(initialSession.currentScreen);
   const [teams, setTeams] = useState<TeamData[]>(initialSession.teams);
   const [activeTeamIndex, setActiveTeamIndex] = useState(initialSession.activeTeamIndex);
@@ -100,7 +109,7 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     window.localStorage.setItem(
-      STORAGE_KEY,
+      storageKey,
       JSON.stringify({ currentScreen, teams, activeTeamIndex, reviewCompleted }),
     );
   }, [currentScreen, teams, activeTeamIndex, reviewCompleted]);
@@ -123,10 +132,12 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
   const prevScreen = () => setCurrentScreen((screen) => Math.max(screen - 1, 0));
 
   const addTeam = (name: string, colorIndex: number) => {
+    if(workshop)return;
     setTeams((previousTeams) => [...previousTeams, createTeam(name, colorIndex)]);
   };
 
   const removeTeam = (index: number) => {
+    if(workshop)return;
     setTeams((previousTeams) => previousTeams.filter((_, teamIndex) => teamIndex !== index));
     setActiveTeamIndex((currentIndex) => {
       if (currentIndex > index) return currentIndex - 1;
@@ -143,6 +154,7 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
   };
 
   const setTeamChallenge = (challenge: Challenge) => {
+    if(workshop)return;
     if (activeTeam?.challenge && activeTeam.challenge.id !== challenge.id) setReviewCompleted(false);
     setTeams((previousTeams) =>
       previousTeams.map((team, index) => index === activeTeamIndex ? (team.challenge && team.challenge.id !== challenge.id ? { ...team, challenge, organism: undefined, canvas: createEmptyCanvas(), pitchTitle: "", pitchSummary: "", votes: 0 } : { ...team, challenge }) : team),
@@ -182,6 +194,7 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
   };
 
   const resetSession = () => {
+    if(workshop)return;
     window.localStorage.removeItem(STORAGE_KEY);
     setCurrentScreen(0);
     setTeams([]);

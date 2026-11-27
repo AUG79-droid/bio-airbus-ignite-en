@@ -1,0 +1,9 @@
+import { describe,it,expect } from "vitest";
+import { createSession,parseCode,codeFor,challengeFor,pools,teamFor,modelPool,canvasKeys,proposalFor,validateProposal,addProposal,allReceived,ranking } from "./workshop";
+describe("shared challenge protocol",()=>{
+ const s=createSession("climate",3,()=>0.3);
+ const make=(slot:number)=>{const t=teamFor(s,slot,"Team "+slot,"en");t.organism=modelPool[slot];canvasKeys.forEach(k=>t.canvas[k]="A complete original explanation of "+k+" with a testable mechanism and relevant constraints.");t.pitchTitle="A proposed design "+slot;t.pitchSummary="We propose an independently developed hypothesis and will compare an equivalent baseline at the same operating conditions, including safety and failure constraints.";return proposalFor(s,slot,t,"en")!;};
+ it("roundtrips a single fixed challenge and rejects incompatible codes",()=>{expect(parseCode(codeFor(s).toLowerCase())).toEqual(s);expect(challengeFor(s)).toEqual(pools.climate[2]);expect(parseCode(codeFor(s).replace("-C-","-G-"))).toBeNull();expect(parseCode(codeFor(s).replace(/-3$/,"-1"))).toBeNull();});
+ it("imports three independent proposals and rejects duplicate slots and unrelated sessions",()=>{let list=[make(2)];expect(list[0]).not.toBeNull();expect(allReceived(s,list)).toBe(false);expect(()=>addProposal(list,make(2),s)).toThrow();expect(validateProposal({...make(1),code:codeFor(createSession("climate",3))},s)).toBeNull();expect(validateProposal({...make(1),canvas:{problem:"short"}},s)).toBeNull();list=addProposal(list,make(1),s);list=addProposal(list,make(3),s);expect(allReceived(s,list)).toBe(true);expect(list.map(p=>p.slot)).toEqual([1,2,3]);});
+ it("does not rank incomplete ratings; equal scores tie",()=>{const list=[make(1),make(2),make(3)];expect(ranking(s,list,{1:[5,5,5,5,5]})).toEqual([]);expect(ranking(s,list,{1:[5,5,5,5,5],2:[4,4,4,4,4],3:[5,5,5,5,5]})).toEqual([{slot:1,total:25,rank:1},{slot:3,total:25,rank:1},{slot:2,total:20,rank:3}]);});
+});
