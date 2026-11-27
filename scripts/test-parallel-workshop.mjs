@@ -123,6 +123,25 @@ try{
  await host.getByTestId("host").click();
  await host.getByTestId("ranking").waitFor();
  assert.equal(await host.getByTestId("session-code").inputValue(),code);
+ await host.reload();
+ await host.getByTestId("saved-workshop").waitFor();
+ await host.evaluate(({code,lang})=>{localStorage.setItem("unrelated-test","keep");localStorage.setItem("biolab-workshop-player-v1:"+lang+":"+code+":1","{\"test\":true}");}, {code,lang:es?"es":"en"});
+ await host.getByTestId("new-workshop").click();
+ await host.getByTestId("spin").waitFor();
+ assert.equal(await host.getByTestId("session-code").count(),0);
+ assert.equal(await host.evaluate(({code,lang})=>localStorage.getItem("biolab-workshop-player-v1:"+lang+":"+code+":1"),{code,lang:es?"es":"en"}),null);
+ assert.equal(await host.evaluate(()=>localStorage.getItem("unrelated-test")),"keep");
+ await host.getByTestId("spin").click();
+ const newCode=await host.getByTestId("session-code").inputValue();
+ assert.notEqual(newCode,code);
+ assert.match(await host.getByTestId("received").innerText(),/0\/3/);
+ await host.getByTestId("import").setInputFiles(files[0]);
+ await host.waitForFunction(()=>Array.from(document.querySelectorAll('[role=status]')).some(x=>x.textContent.includes("team-1.json")));
+ assert.match(await host.getByTestId("received").innerText(),/0\/3/);
+ await host.getByTestId("restart-workshop").click();
+ await host.getByTestId("spin").waitFor();
+ assert.equal(await host.getByTestId("session-code").count(),0);
+ console.log("PASS: start fresh directly from role menu, scoped local reset, old file rejected, restart inside workshop.");
  assert.deepEqual(errors,[]);
  console.log("PASS: common draw, three simultaneous independent full browser journeys, immutable local submission, duplicate/wrong-session rejection, gated comparison, manual ranking and reload persistence.");
 }finally{await browser?.close();server.kill();}
