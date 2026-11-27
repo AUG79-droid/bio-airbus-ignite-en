@@ -37,7 +37,8 @@ try{
  const errors=[];
  for(const p of [host,...players]){p.on("pageerror",e=>errors.push(e.message));p.on("dialog",d=>d.accept());p.setDefaultTimeout(15000);}
  await host.goto(origin+base);
- await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-en-v2");
+ // Opening a saved individual session must show the original cover, not bypass it.
+ await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-es-v2");
  await host.reload();
  await host.getByTestId("resume-session").waitFor();
  assert.equal(await host.getByTestId("competition-entry").count(),0);
@@ -47,6 +48,12 @@ try{
  await host.getByTestId("competition-entry").click();
  await host.getByTestId("host-guide").waitFor();
  await host.getByTestId("guide-next").click();
+ await host.getByTestId("role-help").waitFor();
+ assert.match(await host.getByTestId("host").innerText(),/Crear un taller nuevo|Create a new workshop/);
+ assert.equal(await host.getByTestId("saved-workshop").count(),0);
+ await host.getByTestId("join-entry").click();
+ assert.equal(await host.getByPlaceholder("BL1-…").count(),1);
+ await host.getByRole("button",{name:es?"Volver":"Back",exact:true}).click();
  await host.getByTestId("host").click();
  assert.match(await host.getByTestId("host-track").innerText(),/Adaptación climática|Climate adaptation/i);
  assert.equal(await host.getByTestId("track").count(),0);
@@ -62,7 +69,7 @@ try{
   await p.goto(new URL(links[i],origin+base).href);
   assert.equal(await p.locator("h1").first().innerText(),challenge);
   await p.getByTestId("full-workshop-guide").waitFor();
-  assert.ok(await p.getByText(/four rules/i).count());
+  assert.ok(await p.getByText(es?"Cuatro reglas para una biomímesis rigurosa":/four rules/i).count());
   await p.getByTestId("guide-next").click();
   assert.equal(await p.getByTestId("start-player").isEnabled(),false);
   for(const field of await p.locator("fieldset").all())await field.locator("input[type=radio]").first().check();
@@ -111,6 +118,8 @@ try{
  assert.match(ranking,/1\. (Team|Equipo) 3 · 25\/25/);
  assert.match(ranking,/3\. (Team|Equipo) 2 · 20\/25/);
  await host.reload();
+ await host.getByTestId("saved-workshop").waitFor();
+ assert.match(await host.getByTestId("host").innerText(),/Retomar taller guardado|Resume saved workshop/);
  await host.getByTestId("host").click();
  await host.getByTestId("ranking").waitFor();
  assert.equal(await host.getByTestId("session-code").inputValue(),code);
