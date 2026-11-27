@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, RotateCw, Sparkles } from "lucide-react";
-import { useBioLab, IS_DEMO_MODE } from "@/contexts/BioLabContext";
+import { useBioLab } from "@/contexts/BioLabContext";
 import { CHALLENGES } from "@/data/biolab-data";
 import { CLIMATE_CHALLENGES } from "@/data/climate-challenges";
 import { STRATEGIC_CHALLENGES, challengeTrack, type Track } from "@/data/resilience-expansion";
@@ -65,7 +65,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
   }, [isSpinning, pool, angleStep]);
 
   const handleConfirm = () => {
-    if(!IS_DEMO_MODE&&activeTeam&&!hasBaseline(activeTeam.id,mode,challenge.id))return;
+    if(activeTeam&&!hasBaseline(activeTeam.id,mode,challenge.id))return;
     if (activeTeam?.challenge && activeTeam.challenge.id !== challenge.id && !window.confirm("Changing the challenge clears the active team's model, canvas and pitch. Continue?")) return;
     setTeamChallenge(challenge);
     onNext();
@@ -170,7 +170,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
                     </span>
                     <div className="flex flex-wrap gap-3">
                       <button onClick={spin} className="biolab-btn-ghost"><RotateCw className="h-4 w-4" /> Spin again</button>
-                      {(IS_DEMO_MODE||!activeTeam)&&<button onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button>}
+                      {!activeTeam&&<button onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button>}
                     </div>
                   </div>
                 ) : (
@@ -184,7 +184,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
           </AnimatePresence>
         </div>
 
-        {selected&&!IS_DEMO_MODE&&activeTeam&&<><PilotAssessment key={activeTeam.id+mode+challenge.id} teamId={activeTeam.id} track={mode} phase="pre" challengeId={challenge.id} onComplete={()=>refreshAssessment(n=>n+1)}/><div className="text-center"><button disabled={!hasBaseline(activeTeam.id,mode,challenge.id)} onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button><p className="text-sm mt-2">Submit the four initial questions to continue. No minimum score is required.</p></div></>}
+        {selected&&activeTeam&&<><PilotAssessment key={activeTeam.id+mode+challenge.id} teamId={activeTeam.id} track={mode} phase="pre" challengeId={challenge.id} onComplete={()=>refreshAssessment(n=>n+1)}/><div className="text-center"><button disabled={!hasBaseline(activeTeam.id,mode,challenge.id)} onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button><p className="text-sm mt-2">Submit the four initial questions to continue. No minimum score is required.</p></div></>}
         <div className="flex justify-center mt-10">
           <button onClick={onBack} className="biolab-btn-ghost"><ArrowLeft className="h-4 w-4" /> Back</button>
         </div>
