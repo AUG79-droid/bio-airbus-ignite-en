@@ -1,4 +1,5 @@
-import { useState, useLayoutEffect } from "react";
+import { RESET_NOTICE, returnToCover, resetBioLab } from "@/data/reset-biolab";
+import { useState, useLayoutEffect, useEffect } from "react";
 import { setPreferredTrack, preferredTrack } from "@/components/biolab/PilotAssessment";
 import { challengeTrack, type Track } from "@/data/resilience-expansion";
 import Workshop from "@/components/biolab/Workshop";
@@ -44,7 +45,7 @@ function BioLabApp() {
     <BioCanvasScreen onNext={nextScreen} onBack={prevScreen} />,
     <PitchScreen onNext={nextScreen} onBack={prevScreen} />,
     <VotingScreen onNext={nextScreen} onBack={prevScreen} />,
-    <ResultsScreen onRestart={resetSession} />,
+    <ResultsScreen onRestart={resetBioLab} />,
   ];
 
   return (
@@ -69,6 +70,7 @@ function BioLabApp() {
 }
 
 export default function Index() {
+  useEffect(()=>{const onReset=(event:StorageEvent)=>{if(event.key===RESET_NOTICE&&event.newValue!==null)returnToCover();};window.addEventListener("storage",onReset);return()=>window.removeEventListener("storage",onReset);},[]);
   const query=new URLSearchParams(window.location.search);
   if(query.get('workshop')==='1'&&(query.has('code')||['general','climate','resilience'].includes(query.get('track')??'')))return <Workshop/>;
   return (

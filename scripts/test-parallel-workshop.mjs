@@ -33,6 +33,26 @@ try{
  assert.match(await solo.getByTestId("locked-track").innerText(),/Adaptación climática|Climate adaptation/i);
  assert.equal(await solo.getByRole("button",{name:es?"Innovación general (8 retos)":"General innovation (8 challenges)",exact:true}).count(),0);
  console.log("PASS: individual path, topic choices, original guide, single team, locked climate track.");
+ // Cancel must preserve work; confirm must reset all BioLab data, not other apps.
+ await solo.evaluate(()=>{localStorage.setItem("navigator-unrelated-test","keep");localStorage.setItem("biolab-pilot-track-v1","climate");localStorage.setItem("biolab-pilot-v2:es:team:climate","{}");localStorage.setItem("biolab-pilot-result-v2:example","{}");localStorage.setItem("biolab-workshop-host-v1:es:climate","{}");localStorage.setItem("bio-airbus-ignite-"+(location.pathname.includes("-en/")?"es":"en")+"-v2","{}");sessionStorage.setItem("biolab-workshop-guide-v2:es:climate","true");});
+ solo.once("dialog",d=>d.dismiss());
+ await solo.getByTestId("reset-biolab").click();
+ assert.equal(await solo.evaluate(()=>localStorage.getItem("biolab-pilot-track-v1")),"climate");
+ await solo.getByTestId("locked-track").waitFor();
+ solo.once("dialog",d=>d.accept());
+ await solo.getByTestId("reset-biolab").click();
+ await solo.getByTestId("topic-general").waitFor();
+ assert.equal(await solo.getByTestId("resume-session").count(),0);
+ const stored=await solo.evaluate(()=>({keys:Object.keys(localStorage),unrelated:localStorage.getItem("navigator-unrelated-test"),sessionKeys:Object.keys(sessionStorage),state:JSON.parse(localStorage.getItem("bio-airbus-ignite-"+(location.pathname.includes("-en/")?"en":"es")+"-v2")||"null")}));
+ assert.equal(stored.unrelated,"keep");
+ assert.equal(stored.keys.filter(k=>k.startsWith("biolab-")).length,0);
+ assert.equal(stored.keys.filter(k=>k.startsWith("bio-airbus-ignite")).length,stored.state?1:0);
+ if(stored.state){assert.equal(stored.state.currentScreen,0);assert.deepEqual(stored.state.teams,[]);}
+ assert.equal(stored.sessionKeys.filter(k=>k.startsWith("biolab-")).length,0);
+ await solo.reload();
+ await solo.getByTestId("topic-general").waitFor();
+ assert.equal(await solo.getByTestId("resume-session").count(),0);
+ console.log("PASS: global reset, cancellation, scoped storage, empty cover after reload.");
  await soloContext.close();
  const errors=[];
  for(const p of [host,...players]){p.on("pageerror",e=>errors.push(e.message));p.on("dialog",d=>d.accept());p.setDefaultTimeout(15000);}
@@ -194,6 +214,15 @@ try{
  await host.getByTestId("spin").waitFor();
  assert.equal(await host.getByTestId("session-code").count(),0);
  console.log("PASS: start fresh directly from role menu, scoped local reset, old file rejected, restart inside workshop.");
+ await host.getByTestId("reset-biolab").click();
+ await host.getByTestId("topic-general").waitFor();
+ assert.equal(await host.getByTestId("resume-session").count(),0);
+ assert.equal(await host.evaluate(()=>localStorage.getItem("unrelated-test")),"keep");
+ assert.equal(await host.evaluate(()=>Object.keys(localStorage).some(k=>k.startsWith("biolab-workshop-"))),false);
+ // Other computers are not reset: their sealed proposals remain intact.
+ await players[0].reload();
+ await players[0].getByTestId("download-again").waitFor();
+ console.log("PASS: competition reset returns to cover and leaves independent participant devices untouched.");
  assert.deepEqual(errors,[]);
  console.log("PASS: common draw, three simultaneous independent full browser journeys, immutable local submission, duplicate/wrong-session rejection, gated comparison, common reference comparison and reload persistence.");
 }finally{await browser?.close();server.kill();}
