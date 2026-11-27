@@ -38,7 +38,7 @@ try{
  for(const p of [host,...players]){p.on("pageerror",e=>errors.push(e.message));p.on("dialog",d=>d.accept());p.setDefaultTimeout(15000);}
  await host.goto(origin+base);
  // Opening a saved individual session must show the original cover, not bypass it.
- await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-es-v2");
+ await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-en-v2");
  await host.reload();
  await host.getByTestId("resume-session").waitFor();
  assert.equal(await host.getByTestId("competition-entry").count(),0);
