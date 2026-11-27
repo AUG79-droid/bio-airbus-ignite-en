@@ -128,17 +128,32 @@ try{
  await host.waitForFunction(()=>Array.from(document.querySelectorAll('[role=status]')).some(x=>x.textContent.includes("wrong.json")));
  await host.getByTestId("import").setInputFiles(files.slice(1));
  await host.getByTestId("comparison").waitFor();
+ await host.getByTestId("common-reference").waitFor();
+ assert.ok((await host.getByTestId("reference-model").innerText()).trim().length>0);
+ assert.ok((await host.getByTestId("reference-solution").innerText()).trim().length>30);
+ const common=await host.getByTestId("common-reference").innerText();
+ assert.equal(await host.locator('[data-testid^="rating-"]').count(),0);
  assert.equal(await host.getByTestId("ranking").count(),0);
- for(let slot=1;slot<=3;slot++)for(let k=0;k<5;k++)await host.getByTestId("rating-"+slot+"-"+k).selectOption(slot===2?"4":"5");
- const ranking=await host.getByTestId("ranking").innerText();
- assert.match(ranking,/1\. (Team|Equipo) 1 · 25\/25/);
- assert.match(ranking,/1\. (Team|Equipo) 3 · 25\/25/);
- assert.match(ranking,/3\. (Team|Equipo) 2 · 20\/25/);
+ for(let slot=1;slot<=3;slot++){
+  await host.getByTestId("compare-team-"+slot).click();
+  assert.equal(await host.getByTestId("selected-proposal").innerText(),"Independent proposal team "+slot);
+  assert.equal(await host.getByTestId("common-reference").innerText(),common);
+  assert.equal(await host.locator('[data-testid^="reference-field-"]').count(),6);
+  assert.match(await host.getByTestId("reference-field-problem").innerText(),new RegExp("Team "+slot+" section 1"));
+ }
+ const comparisonDownload=host.waitForEvent("download");
+ await host.getByTestId("export-comparison").click();
+ const compared=JSON.parse((await readFile(await (await comparisonDownload).path())).toString());
+ assert.equal(compared.schema,"biolab-workshop-comparison-v2");
+ assert.equal(compared.proposals.length,3);
+ assert.ok(compared.reference.answer.solution);
+ assert.equal("ranking" in compared,false);
+ assert.equal("ratings" in compared,false);
  await host.reload();
  await host.getByTestId("saved-workshop").waitFor();
  assert.match(await host.getByTestId("host").innerText(),/Retomar taller guardado|Resume saved workshop/);
  await host.getByTestId("host").click();
- await host.getByTestId("ranking").waitFor();
+ await host.getByTestId("common-reference").waitFor();
  assert.equal(await host.getByTestId("session-code").inputValue(),code);
  await host.reload();
  await host.getByTestId("saved-workshop").waitFor();
@@ -160,5 +175,5 @@ try{
  assert.equal(await host.getByTestId("session-code").count(),0);
  console.log("PASS: start fresh directly from role menu, scoped local reset, old file rejected, restart inside workshop.");
  assert.deepEqual(errors,[]);
- console.log("PASS: common draw, three simultaneous independent full browser journeys, immutable local submission, duplicate/wrong-session rejection, gated comparison, manual ranking and reload persistence.");
+ console.log("PASS: common draw, three simultaneous independent full browser journeys, immutable local submission, duplicate/wrong-session rejection, gated comparison, common reference comparison and reload persistence.");
 }finally{await browser?.close();server.kill();}
