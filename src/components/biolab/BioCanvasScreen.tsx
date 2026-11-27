@@ -1,3 +1,4 @@
+import { CLIMATE_CHALLENGES } from "@/data/climate-challenges";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
@@ -90,6 +91,10 @@ export default function BioCanvasScreen({onNext,onBack}:BioCanvasScreenProps) {
             </div>
           </div>
         </section>
+        {CLIMATE_CHALLENGES.some(item => item.id === challenge?.id) && <section className="max-w-6xl mx-auto biolab-card mb-6" aria-label="Climate adaptation guide">
+          <h2 className="text-xl font-display font-bold mb-3">What your climate proposal should demonstrate</h2>
+          <p className="text-base text-muted-foreground leading-7">Across the six answers, identify a future physical hazard, the exposed item and its vulnerability. Justify the biological mechanism, define the function and compare the baseline and proposal under equivalent exposure. Specify metrics, adverse effects and evidence gaps, including specialist review. Do not confuse emissions reductions with adaptation or claim operational improvements without evidence.</p>
+        </section>}
         {mismatch && (
           <section className="max-w-6xl mx-auto rounded-2xl border-2 border-amber-500 bg-amber-50 px-5 py-5 mb-6 text-slate-900" role="status">
             <h2 className="text-lg font-bold mb-2">Caution: this connection is not yet justified</h2>

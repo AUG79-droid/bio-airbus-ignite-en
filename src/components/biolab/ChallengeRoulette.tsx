@@ -61,6 +61,7 @@ export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteP
   }, [isSpinning, pool, angleStep]);
 
   const handleConfirm = () => {
+    if (activeTeam?.challenge && activeTeam.challenge.id !== challenge.id && !window.confirm("Changing the challenge clears the active team's model, canvas and pitch. Continue?")) return;
     setTeamChallenge(challenge);
     onNext();
   };
