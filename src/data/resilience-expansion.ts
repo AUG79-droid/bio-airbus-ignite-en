@@ -247,7 +247,7 @@ export const EXTRA_MODELS: Organism[] = [
     "strategy": "Specialised hairs reflect part of incident sunlight and enhance infrared thermal emission.",
     "principle": "Solar reflection and thermal emission",
     "fact": "Response depends on spectrum, orientation, surroundings and ageing; cooling is not guaranteed.",
-    "image": "o11.svg"
+    "image": "o11-photo.jpg"
   },
   {
     "id": "o12",
@@ -255,7 +255,7 @@ export const EXTRA_MODELS: Organism[] = [
     "strategy": "Its surface geometry has inspired research into sand erosion resistance.",
     "principle": "Particle-impact management",
     "fact": "Results depend on material, particle trajectories and conditions; a texture is not universally erosion-resistant.",
-    "image": "o12.svg"
+    "image": "o12-photo.jpg"
   },
   {
     "id": "o13",
@@ -263,7 +263,7 @@ export const EXTRA_MODELS: Organism[] = [
     "strategy": "Scale layers change dimensions differently with moisture, producing movement.",
     "principle": "Differential hygroscopic response",
     "fact": "Humidity is not the same as rain or condensation; response may be slow, irreversible or temperature-dependent.",
-    "image": "o13.svg"
+    "image": "o13-photo.jpg"
   },
   {
     "id": "o14",
@@ -271,7 +271,7 @@ export const EXTRA_MODELS: Organism[] = [
     "strategy": "Feather microstructure contributes to insulation of the coat.",
     "principle": "Structural insulation and trapped air",
     "fact": "Insulation may lose effectiveness when wet and cannot alone solve icing, fuel or energy security.",
-    "image": "o14.svg"
+    "image": "o14-photo.jpg"
   },
   {
     "id": "o15",
@@ -279,7 +279,7 @@ export const EXTRA_MODELS: Organism[] = [
     "strategy": "This slime mould reorganises transport networks between food sources; its efficiency and fault tolerance have been studied.",
     "principle": "Adaptive networks and redundancy",
     "fact": "A biological network does not establish supplier independence, quality, capacity or lead times.",
-    "image": "o15.svg"
+    "image": "o15-photo.jpg"
   },
   {
     "id": "o16",
@@ -287,7 +287,7 @@ export const EXTRA_MODELS: Organism[] = [
     "strategy": "Some plants seal wounds through exudates or mechanical responses; later repair can be a distinct process.",
     "principle": "Self-sealing and functional repair",
     "fact": "Sealing a crack does not demonstrate restored strength or airworthiness; it may conceal damage.",
-    "image": "o16.svg"
+    "image": "o16-photo.jpg"
   }
 ].map(o=>({...o,image:import.meta.env.BASE_URL+"images/nature/"+o.image}));
 export const challengeTrack = (id?: string) => id && STRATEGIC_CHALLENGES.some(c=>c.id===id) ? "resilience" : id && /^(c9|c10|c11|c12|c13|c14|c15)$/.test(id) ? "climate" : "general";

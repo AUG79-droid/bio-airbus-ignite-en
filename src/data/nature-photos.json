@@ -1,0 +1,57 @@
+{
+  "o11": {
+    "id": "o11",
+    "name": "Cataglyphis bombycinus casent0102114 profile 1.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Cataglyphis_bombycinus_casent0102114_profile_1.jpg",
+    "author": "April Nobile / AntWeb.org",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "source": "https://www.antweb.org/specimen.do?name=casent0102114",
+    "page": "https://commons.wikimedia.org/wiki/File:Cataglyphis_bombycinus_casent0102114_profile_1.jpg"
+  },
+  "o12": {
+    "id": "o12",
+    "name": "Androctonus australis qtl1.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Androctonus_australis_qtl1.jpg",
+    "author": "Quartl",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "page": "https://commons.wikimedia.org/wiki/File:Androctonus_australis_qtl1.jpg"
+  },
+  "o13": {
+    "id": "o13",
+    "name": "A pine cone.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/A_pine_cone.jpg",
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "page": "https://commons.wikimedia.org/wiki/File:A_pine_cone.jpg"
+  },
+  "o14": {
+    "id": "o14",
+    "name": "Emperor penguins (2).jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Emperor_penguins_%282%29.jpg",
+    "author": "lin padgham",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+    "page": "https://commons.wikimedia.org/wiki/File:Emperor_penguins_(2).jpg"
+  },
+  "o15": {
+    "id": "o15",
+    "name": "Physarum polycephalum plasmodium.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Physarum_polycephalum_plasmodium.jpg",
+    "author": "frankenstoen",
+    "license": "CC BY 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+    "page": "https://commons.wikimedia.org/wiki/File:Physarum_polycephalum_plasmodium.jpg"
+  },
+  "o16": {
+    "id": "o16",
+    "name": "Resin wound.jpg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Resin_wound.jpg",
+    "author": "Dunemaire",
+    "license": "CC BY 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.5/",
+    "page": "https://commons.wikimedia.org/wiki/File:Resin_wound.jpg"
+  }
+}
