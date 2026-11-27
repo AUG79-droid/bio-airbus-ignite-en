@@ -139,14 +139,14 @@ export function setPreferredTrack(track:Track){try{localStorage.setItem(PREF,tra
 export function hasBaseline(id:string,track:PilotTrack){const p=read(id,track).pre;return Array.isArray(p)&&p.length===4&&p.every(x=>Number.isInteger(x)&&x>=0&&x<=2);}
 const score=(answers:number[]|undefined,qs:Question[])=>answers?.length===qs.length?answers.filter((a,i)=>a===qs[i][4]).length:null;
 export function PilotAssessment({teamId,track,phase,challengeId}:{teamId:string;track:PilotTrack;phase:Phase;challengeId?:string}){
- const [record,setRecord]=useState(()=>read(teamId,track));
+ const [record,setRecord]=useState(()=>{const data=read(teamId,track);return phase==="post"&&data.challengeId&&data.challengeId!==challengeId?{pre:data.pre}:data;});
  const [answers,setAnswers]=useState<number[]>(()=>record[phase]??[-1,-1,-1,-1]);
  const [utility,setUtility]=useState(record.utility??0),[clarity,setClarity]=useState(record.clarity??0),[transfer,setTransfer]=useState(record.transfer??0);
  const [error,setError]=useState(false);
  const questions=bank[track][phase],locked=record[phase]?.length===4;
  const before=score(record.pre,bank[track].pre),after=score(record.post,bank[track].post);
  const save=()=>{try{const next={...read(teamId,track),[phase]:answers,...(phase==="post"?{utility,clarity,transfer,challengeId}: {})};write(teamId,track,next);setRecord(next);setError(false);}catch{setError(true);}};
- const exportResult=()=>{const data={schema:1,assessmentVersion:"biolab-pilot-v1",unit:"session/team",track,challengeId:record.challengeId??null,preScore:before,postScore:after,maxScore:4,utility:record.utility,clarity:record.clarity,transfer:record.transfer,limitation:"Self-reported use; descriptive short learning assessment; no identity, technical approval or operational benefit."};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="biolab-pilot-result.json";a.click();URL.revokeObjectURL(url);};
+ const exportResult=()=>{const data={schema:1,assessmentVersion:"biolab-pilot-v1",unit:"session/team",sessionKey:teamId+":"+track,track,challengeId:record.challengeId??null,preScore:before,postScore:after,maxScore:4,utility:record.utility,clarity:record.clarity,transfer:record.transfer,limitation:"Self-reported use; descriptive short learning assessment; no identity, technical approval or operational benefit."};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="biolab-pilot-result.json";a.click();URL.revokeObjectURL(url);};
  return <section className="max-w-6xl mx-auto biolab-card my-6" aria-label={phase==="pre"?"Initial assessment":"Final assessment"}>
  <h2 className="font-display text-2xl font-bold mb-3">{phase==="pre"?"Before the challenge · 4 questions":"After the challenge · learning and usefulness"}</h2>
  <p className="text-muted-foreground mb-4">{phase==="pre"?"Answer without consulting references. Answers are not revealed until the end; no pass score is required, only four completed responses.":"Answer after reviewing the proposal and example. Rate the usefulness of the route. Scores are indicative, not technical competence accreditation."}</p>

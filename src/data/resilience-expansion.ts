@@ -90,7 +90,7 @@ export const expansionReferences: Record<string,ReferenceSolution> = {
     "answer": {
       "problem": "Compare deterioration of specimens with the same function and specialist-defined exposure.",
       "organism": "Its surface geometry has inspired research into sand erosion resistance.",
-      "principle": "Particle-impact management",
+      "principle": "Investigate how surface geometry influences particle contact and material loss, without assuming a universal erosion benefit.",
       "solution": "Explore textures on coupons and compare wear against a smooth reference.",
       "benefit": "Measure mass loss and surface properties; assess cleaning, inspection and fabrication.",
       "implementation": "Materials and Quality: define representative exposure, tests and criteria; record adverse effects."
@@ -216,7 +216,7 @@ export const expansionReferences: Record<string,ReferenceSolution> = {
     "answer": {
       "problem": "Compare a test assembly with limited access against a removable alternative of equivalent function.",
       "organism": "Toe microstructures allow reversible adhesion through surface interactions.",
-      "principle": "Reversible adhesion",
+      "principle": "Explore reversible adhesion to separate attachment from assembly replacement and test repeatability over comparable cycles.",
       "solution": "Investigate a reversible attachment concept on a bench while retaining interfaces and inspection requirements.",
       "benefit": "Measure disassembly time, damage and repeatability; examine mass and maintenance.",
       "implementation": "Engineering and Maintenance: verify mechanical criteria, use cycles and rejection conditions in the laboratory."
