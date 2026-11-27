@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { setPreferredTrack } from "@/components/biolab/PilotAssessment";
-import type { Track } from "@/data/resilience-expansion";
+import { setPreferredTrack, preferredTrack } from "@/components/biolab/PilotAssessment";
+import { challengeTrack, type Track } from "@/data/resilience-expansion";
 import Workshop from "@/components/biolab/Workshop";
 import { BioLabProvider, useBioLab } from "@/contexts/BioLabContext";
 import BioLabNav from "@/components/biolab/BioLabNav";
@@ -20,7 +20,8 @@ import { AnimatePresence, motion } from "framer-motion";
 function BioLabApp() {
   const { currentScreen, nextScreen, prevScreen, resetSession, activeTeam, teams, setScreen } = useBioLab();
   const [landing,setLanding]=useState(true);
-  const startTrack=(track:Track)=>{
+  const startTrack=(track:Track,participation:"single"|"competition")=>{
+    if(participation==="competition"){window.location.assign(import.meta.env.BASE_URL+"?workshop=1&track="+track);return;}
     if(teams.length>0){
       if(!window.confirm("Start a new challenge? The saved individual session in this browser will be replaced."))return;
       resetSession();
@@ -36,7 +37,7 @@ function BioLabApp() {
     <WelcomeScreen onNext={startTrack} />,
     <HowItWorksScreen onNext={nextScreen} onBack={prevScreen} />,
     <TeamsScreen onNext={nextScreen} onBack={prevScreen} />,
-    <ChallengeRoulette key={activeTeam?.id ?? "none"} onNext={nextScreen} onBack={prevScreen} />,
+    <ChallengeRoulette lockedTrack={activeTeam?.challenge?challengeTrack(activeTeam.challenge.id):preferredTrack()} key={activeTeam?.id ?? "none"} onNext={nextScreen} onBack={prevScreen} />,
     <NatureLibrary onNext={nextScreen} onBack={prevScreen} />,
     <MatchingScreen onNext={nextScreen} onBack={prevScreen} />,
     <BioCanvasScreen onNext={nextScreen} onBack={prevScreen} />,
@@ -66,7 +67,8 @@ function BioLabApp() {
 }
 
 export default function Index() {
-  if(new URLSearchParams(window.location.search).get('workshop')==='1')return <Workshop/>;
+  const query=new URLSearchParams(window.location.search);
+  if(query.get('workshop')==='1'&&(query.has('code')||['general','climate','resilience'].includes(query.get('track')??'')))return <Workshop/>;
   return (
     <BioLabProvider>
       <BioLabApp />

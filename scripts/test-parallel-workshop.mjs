@@ -13,15 +13,43 @@ try{
  browser=await chromium.launch({headless:true});
  const contexts=await Promise.all(Array.from({length:4},()=>browser.newContext({acceptDownloads:true})));
  const [host,...players]=await Promise.all(contexts.map(c=>c.newPage()));
+ const soloContext=await browser.newContext();
+ const solo=await soloContext.newPage();
+ solo.setDefaultTimeout(15000);
+ await solo.goto(origin+base);
+ assert.equal(await solo.getByTestId("competition-entry").count(),0);
+ for(const topic of ["general","resilience","climate"]){
+   await solo.getByTestId("topic-"+topic).click();
+   await solo.getByTestId("participation-choice").waitFor();
+   assert.equal(await solo.getByTestId("topic-"+topic).getAttribute("aria-pressed"),"true");
+ }
+ await solo.getByTestId("single-entry").click();
+ await solo.getByTestId("guide-next").waitFor();
+ await solo.getByTestId("guide-next").click();
+ await solo.locator('input[type=text]').fill("Independent Lab");
+ await solo.getByRole("button",{name:es?"Añadir":"Add",exact:true}).click();
+ await solo.getByRole("button",{name:es?"Asignar retos":"Assign challenges",exact:false}).click();
+ await solo.getByTestId("locked-track").waitFor();
+ assert.match(await solo.getByTestId("locked-track").innerText(),/Adaptación climática|Climate adaptation/i);
+ assert.equal(await solo.getByRole("button",{name:es?"Innovación general (8 retos)":"General innovation (8 challenges)",exact:true}).count(),0);
+ console.log("PASS: individual path, topic choices, original guide, single team, locked climate track.");
+ await soloContext.close();
  const errors=[];
  for(const p of [host,...players]){p.on("pageerror",e=>errors.push(e.message));p.on("dialog",d=>d.accept());p.setDefaultTimeout(15000);}
  await host.goto(origin+base);
  await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-en-v2");
  await host.reload();
  await host.getByTestId("resume-session").waitFor();
+ assert.equal(await host.getByTestId("competition-entry").count(),0);
+ await host.getByTestId("topic-climate").click();
+ await host.getByTestId("participation-choice").waitFor();
+ assert.match(await host.getByTestId("selected-topic").innerText(),/Adaptación climática|Climate Adaptation/i);
  await host.getByTestId("competition-entry").click();
+ await host.getByTestId("host-guide").waitFor();
+ await host.getByTestId("guide-next").click();
  await host.getByTestId("host").click();
- await host.getByTestId("track").selectOption("climate");
+ assert.match(await host.getByTestId("host-track").innerText(),/Adaptación climática|Climate adaptation/i);
+ assert.equal(await host.getByTestId("track").count(),0);
  await host.getByTestId("count").selectOption("3");
  await host.getByTestId("spin").click();
  const code=await host.getByTestId("session-code").inputValue();

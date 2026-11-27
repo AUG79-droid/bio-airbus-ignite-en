@@ -1,7 +1,8 @@
+import { useState, useRef } from "react";
 import type { Track } from "@/data/resilience-expansion";
 import { motion } from "framer-motion";
 interface WelcomeScreenProps {
-  onNext: (track: Track) => void;
+  onNext: (track: Track, participation: "single" | "competition") => void;
   onResume?: () => void;
 }
 
@@ -13,6 +14,10 @@ const QUICK_FLOW = [
 ];
 
 export default function WelcomeScreen({ onNext, onResume }: WelcomeScreenProps) {
+  const [track,setTrack]=useState<Track|null>(null);
+  const modeRef=useRef<HTMLElement>(null);
+  const names={general:"General innovation",climate:"Climate adaptation",resilience:"Strategic resilience"};
+  const choose=(value:Track)=>{setTrack(value);requestAnimationFrame(()=>modeRef.current?.scrollIntoView({behavior:"smooth",block:"center"}));};
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <img
@@ -97,17 +102,24 @@ export default function WelcomeScreen({ onNext, onResume }: WelcomeScreenProps) 
         </div>
 
         <section className="max-w-5xl mx-auto mb-8 rounded-2xl bg-slate-950/80 border border-white/20 p-5 text-white">
-          <h2 className="font-display text-2xl font-bold mb-2">Choose your learning objective</h2>
-          <p className="text-slate-200 mb-4">Work individually or in a team. Follow the instructions, solve one challenge and compare your proposal with a reference. No facilitator required.</p>
+          <h2 className="font-display text-2xl font-bold mb-2">01 · Choose your topic</h2>
+          <p className="text-slate-200 mb-4">Choose what you want to learn. Then decide whether to play with one team or multiple teams.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">General Innovation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore bio-inspired solutions for design, operations and maintenance. 8 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>onNext("general")}>Start general innovation</button></div>
-            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Climate Adaptation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Identify future physical vulnerabilities and formulate testable adaptation ideas. 7 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>onNext("climate")}>Start climate adaptation</button></div>
-            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Strategic Resilience</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore dependencies, recovery, coordination and longevity. 4 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>onNext("resilience")}>Start strategic resilience</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">General Innovation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore bio-inspired solutions for design, operations and maintenance. 8 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} data-testid="topic-general" aria-pressed={track==="general"} onClick={()=>choose("general")}>{track==="general"?"✓ Selected":"Choose general innovation"}</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Climate Adaptation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Identify future physical vulnerabilities and formulate testable adaptation ideas. 7 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} data-testid="topic-climate" aria-pressed={track==="climate"} onClick={()=>choose("climate")}>{track==="climate"?"✓ Selected":"Choose climate adaptation"}</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Strategic Resilience</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore dependencies, recovery, coordination and longevity. 4 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} data-testid="topic-resilience" aria-pressed={track==="resilience"} onClick={()=>choose("resilience")}>{track==="resilience"?"✓ Selected":"Choose strategic resilience"}</button></div>
           </div>
           <p className="text-sm text-slate-300 mt-3">Indicative duration: 25–40 min per challenge. Initial and final assessments; voluntary export of unnamed learning data.</p>
         </section>
+        {track&&<motion.section ref={modeRef} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} className="max-w-5xl mx-auto mb-8 rounded-2xl bg-slate-950/80 border border-white/20 p-5 text-white" data-testid="participation-choice">
+          <h2 className="font-display text-2xl font-bold mb-2">02 · How will you play?</h2>
+          <p className="text-slate-200 mb-4" data-testid="selected-topic">Selected topic: <strong>{names[track]}</strong></p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">One team</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Play individually or in a group, on one computer. Compare your proposal with the reference.</p><button data-testid="single-entry" type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto" style={{minHeight:64}} onClick={()=>onNext(track,"single")}>Continue with one team</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Multiple teams</h3><p className="mt-2 mb-4 text-slate-200 flex-1">One common challenge and one wheel. Each team works on its own computer, then you compare proposals.</p><button data-testid="competition-entry" type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto" style={{minHeight:64}} onClick={()=>onNext(track,"competition")}>Continue with multiple teams</button></div>
+          </div>
+        </motion.section>}
         <div className="max-w-5xl mx-auto mb-8 flex flex-wrap justify-center items-center gap-4">
-          <a href="?workshop=1" data-testid="competition-entry" className="biolab-btn-accent text-center">Competition · multiple teams</a>
           {onResume && <button type="button" data-testid="resume-session" onClick={onResume} className="rounded-xl border border-white/25 px-5 py-3 text-white font-semibold hover:bg-white/10">Resume my saved session</button>}
         </div>
 
