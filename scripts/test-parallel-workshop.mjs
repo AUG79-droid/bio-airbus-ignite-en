@@ -16,6 +16,9 @@ try{
  const errors=[];
  for(const p of [host,...players]){p.on("pageerror",e=>errors.push(e.message));p.on("dialog",d=>d.accept());p.setDefaultTimeout(15000);}
  await host.goto(origin+base);
+ await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-en-v2");
+ await host.reload();
+ await host.getByTestId("resume-session").waitFor();
  await host.getByTestId("competition-entry").click();
  await host.getByTestId("host").click();
  await host.getByTestId("track").selectOption("climate");
@@ -30,6 +33,9 @@ try{
  const files=await Promise.all(players.map(async(p,i)=>{
   await p.goto(new URL(links[i],origin+base).href);
   assert.equal(await p.locator("h1").first().innerText(),challenge);
+  await p.getByTestId("full-workshop-guide").waitFor();
+  assert.ok(await p.getByText(/four rules/i).count());
+  await p.getByTestId("guide-next").click();
   assert.equal(await p.getByTestId("start-player").isEnabled(),false);
   for(const field of await p.locator("fieldset").all())await field.locator("input[type=radio]").first().check();
   await p.getByRole("button",{name:es?"Guardar evaluación":"Save assessment",exact:true}).click();

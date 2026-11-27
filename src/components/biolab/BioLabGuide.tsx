@@ -57,14 +57,18 @@ const screenSteps: Guidance[] = [
     tip: "The reference is not the only possible solution and is not an approved technology. Identify missing evidence and the test that could validate your idea." },
 ];
 
-export default function BioLabGuide() {
-  const { currentScreen, activeTeam, guideSubstep, teams } = useBioLab();
+export default function BioLabGuide({stageOverride,competition=false}:{stageOverride?:number;competition?:boolean}={}) {
+  const { currentScreen:storedScreen, activeTeam, guideSubstep, teams } = useBioLab();
+  const currentScreen=stageOverride??storedScreen;
   const [minimized, setMinimized] = useState(false);
   const [showTip, setShowTip] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [speechError, setSpeechError] = useState("");
 
   const guide = useMemo(() => {
+    if(competition&&currentScreen===1)return {title:"Guide · How competition works",instruction:"Read the four biomimicry rules and worked example before starting. The challenge is fixed for all teams.",tip:"Choose by function and mechanism, not shape. You do not have to wait for other teams."};
+    if(competition&&currentScreen===3)return {title:"Common challenge · initial assessment",instruction:"All teams have exactly the same challenge. Complete the initial assessment and explore the nature library.",tip:"You cannot spin again. Your proposal must address the common challenge."};
+    if(competition&&currentScreen===8)return {title:"Submit proposal",instruction:"Lock and download your JSON proposal. Share it with the workshop host when ready.",tip:"Wait for all proposals to be collected before viewing reference answers."};
     if (currentScreen === 6) return canvasSteps[Math.min(Math.max(guideSubstep, 0), 5)];
     const base = screenSteps[Math.min(Math.max(currentScreen, 0), screenSteps.length - 1)];
     if (currentScreen === 4 && activeTeam?.challenge && activeTeam?.organism) {
@@ -74,7 +78,7 @@ export default function BioLabGuide() {
       return {...base, tip: `There are ${teams.length} teams. Each must provide a title and a pitch before the group can begin the review.`};
     }
     return base;
-  }, [currentScreen, guideSubstep, activeTeam?.challenge, activeTeam?.organism, teams.length]);
+  }, [currentScreen, guideSubstep, activeTeam?.challenge, activeTeam?.organism, teams.length,competition]);
   const message = showTip ? guide.tip : guide.instruction;
 
   useEffect(() => {

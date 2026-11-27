@@ -1,7 +1,8 @@
-import { setPreferredTrack } from "@/components/biolab/PilotAssessment";
+import type { Track } from "@/data/resilience-expansion";
 import { motion } from "framer-motion";
 interface WelcomeScreenProps {
-  onNext: () => void;
+  onNext: (track: Track) => void;
+  onResume?: () => void;
 }
 
 const QUICK_FLOW = [
@@ -11,7 +12,7 @@ const QUICK_FLOW = [
   { n: "4", title: "Present and vote", text: "Each team prepares a short pitch and the group votes for the most promising proposals." },
 ];
 
-export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
+export default function WelcomeScreen({ onNext, onResume }: WelcomeScreenProps) {
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <img
@@ -96,20 +97,20 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
         </div>
 
         <section className="max-w-5xl mx-auto mb-8 rounded-2xl bg-slate-950/80 border border-white/20 p-5 text-white">
-          <h2 className="font-display text-2xl font-bold mb-2">Individual or single-team mode · choose your objective</h2>
+          <h2 className="font-display text-2xl font-bold mb-2">Choose your learning objective</h2>
           <p className="text-slate-200 mb-4">Work individually or in a team. Follow the instructions, solve one challenge and compare your proposal with a reference. No facilitator required.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">General Innovation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore bio-inspired solutions for design, operations and maintenance. 8 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>{setPreferredTrack("general");onNext();}}>Start general innovation</button></div>
-            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Climate Adaptation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Identify future physical vulnerabilities and formulate testable adaptation ideas. 7 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>{setPreferredTrack("climate");onNext();}}>Start climate adaptation</button></div>
-            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Strategic Resilience</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore dependencies, recovery, coordination and longevity. 4 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>{setPreferredTrack("resilience");onNext();}}>Start strategic resilience</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">General Innovation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore bio-inspired solutions for design, operations and maintenance. 8 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>onNext("general")}>Start general innovation</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Climate Adaptation</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Identify future physical vulnerabilities and formulate testable adaptation ideas. 7 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>onNext("climate")}>Start climate adaptation</button></div>
+            <div className="rounded-xl border border-white/20 p-4 flex flex-col"><h3 className="text-xl font-bold">Strategic Resilience</h3><p className="mt-2 mb-4 text-slate-200 flex-1">Explore dependencies, recovery, coordination and longevity. 4 challenges.</p><button type="button" className="biolab-btn-accent w-full justify-center text-center mt-auto shrink-0" style={{ height: 64, minHeight: 64, padding: "10px 12px", boxSizing: "border-box", whiteSpace: "normal", lineHeight: 1.3 }} onClick={()=>onNext("resilience")}>Start strategic resilience</button></div>
           </div>
           <p className="text-sm text-slate-300 mt-3">Indicative duration: 25–40 min per challenge. Initial and final assessments; voluntary export of unnamed learning data.</p>
         </section>
-        <section className="max-w-5xl mx-auto mb-8 rounded-2xl bg-slate-950/80 border border-white/20 p-6 text-white">
-          <h2 className="font-display text-2xl font-bold mb-2">Competition mode · multiple teams</h2>
-          <p className="text-slate-200 mb-4">One wheel, one common challenge, teams working simultaneously on their own computers and a final comparison.</p>
-          <a href="?workshop=1" className="biolab-btn-accent" data-testid="competition-entry">Host or join a competition</a>
-        </section>
+        <div className="max-w-5xl mx-auto mb-8 flex flex-wrap justify-center items-center gap-4">
+          <a href="?workshop=1" data-testid="competition-entry" className="biolab-btn-accent text-center">Competition · multiple teams</a>
+          {onResume && <button type="button" data-testid="resume-session" onClick={onResume} className="rounded-xl border border-white/25 px-5 py-3 text-white font-semibold hover:bg-white/10">Resume my saved session</button>}
+        </div>
+
         <div className="text-center mb-12">
           <p className="text-sm max-w-2xl mx-auto mb-6" style={{ color: "hsl(210, 15%, 58%)" }}>
             Biomimicry studies how living systems perform functions and translates those strategies into human design. You will move from function to biological mechanism, design principle, application and validation.
