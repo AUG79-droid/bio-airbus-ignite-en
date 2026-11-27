@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { setPreferredTrack } from "@/components/biolab/PilotAssessment";
+import type { Track } from "@/data/resilience-expansion";
 import Workshop from "@/components/biolab/Workshop";
 import { BioLabProvider, useBioLab } from "@/contexts/BioLabContext";
 import BioLabNav from "@/components/biolab/BioLabNav";
@@ -15,10 +18,22 @@ import ResultsScreen from "@/components/biolab/ResultsScreen";
 import { AnimatePresence, motion } from "framer-motion";
 
 function BioLabApp() {
-  const { currentScreen, nextScreen, prevScreen, resetSession, activeTeam } = useBioLab();
+  const { currentScreen, nextScreen, prevScreen, resetSession, activeTeam, teams, setScreen } = useBioLab();
+  const [landing,setLanding]=useState(true);
+  const startTrack=(track:Track)=>{
+    if(teams.length>0){
+      if(!window.confirm("Start a new challenge? The saved individual session in this browser will be replaced."))return;
+      resetSession();
+    }
+    setPreferredTrack(track);
+    setLanding(false);
+    setScreen(1);
+  };
+  const resume=()=>{setLanding(false);if(currentScreen===0)setScreen(1);};
+  if(landing||currentScreen===0)return <div className="min-h-screen bg-background"><WelcomeScreen onNext={startTrack} onResume={currentScreen>0||teams.length>0?resume:undefined}/><BioLabGuide stageOverride={0}/></div>;
 
   const screens = [
-    <WelcomeScreen onNext={nextScreen} />,
+    <WelcomeScreen onNext={startTrack} />,
     <HowItWorksScreen onNext={nextScreen} onBack={prevScreen} />,
     <TeamsScreen onNext={nextScreen} onBack={prevScreen} />,
     <ChallengeRoulette key={activeTeam?.id ?? "none"} onNext={nextScreen} onBack={prevScreen} />,

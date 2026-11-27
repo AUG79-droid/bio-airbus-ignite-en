@@ -46,7 +46,7 @@ export default function BioLabNav() {
       aria-label="Learning route"
     >
       <div className="biolab-container min-h-20 flex items-center gap-3">
-        <button onClick={() => setScreen(1)} className="group flex shrink-0 max-w-[270px] min-w-0 items-center gap-3 text-left">
+        <button onClick={() => setScreen(0)} className="group flex shrink-0 max-w-[270px] min-w-0 items-center gap-3 text-left">
           <div className="h-9 w-9 shrink-0 rounded-xl bg-primary text-primary-foreground grid place-items-center font-display text-xs font-black shadow-sm">
             BI
           </div>

@@ -27,9 +27,11 @@ const BIOMIMICRY_RULES = [
 interface HowItWorksScreenProps {
   onNext: () => void;
   onBack: () => void;
+  competition?: boolean;
+  nextLabel?: string;
 }
 
-export default function HowItWorksScreen({ onNext, onBack }: HowItWorksScreenProps) {
+export default function HowItWorksScreen({ onNext, onBack, competition=false, nextLabel }: HowItWorksScreenProps) {
   return (
     <div className="min-h-screen flex flex-col justify-center py-20 biolab-grid-pattern">
       <div className="biolab-container">
@@ -56,7 +58,7 @@ export default function HowItWorksScreen({ onNext, onBack }: HowItWorksScreenPro
                 </div>
                 <div>
                   <h3 className="text-base font-semibold font-display text-foreground mb-1">{step.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{competition&&step.number===1?"Each team works on its own computer with its assigned team number.":competition&&step.number===2?"The host spins once; all teams share exactly the same challenge.":competition&&step.number===6?"Submit your proposal and compare all proposals using the same rubric.":step.description}</p>
                 </div>
               </div>
             </motion.div>
@@ -105,8 +107,8 @@ export default function HowItWorksScreen({ onNext, onBack }: HowItWorksScreenPro
 
         <div className="flex justify-center gap-4">
           <button onClick={onBack} className="biolab-btn-ghost">← Back</button>
-          <button onClick={onNext} className="biolab-btn-primary">
-            Form teams
+          <button data-testid="guide-next" onClick={onNext} className="biolab-btn-primary">
+            {nextLabel??"Form teams"}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
           </button>
         </div>
