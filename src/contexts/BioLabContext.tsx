@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { TeamData, Challenge, Organism, createTeam, CanvasData, isCanvasEntryReady, isPitchTitleReady, isPitchSummaryReady } from "@/data/biolab-data";
+import { TeamData, Challenge, Organism, createTeam, createEmptyCanvas, CanvasData, isCanvasEntryReady, isPitchTitleReady, isPitchSummaryReady } from "@/data/biolab-data";
 
 const STORAGE_KEY = "bio-airbus-ignite-en-v2";
 
@@ -143,8 +143,9 @@ export function BioLabProvider({ children }: { children: ReactNode }) {
   };
 
   const setTeamChallenge = (challenge: Challenge) => {
+    if (activeTeam?.challenge && activeTeam.challenge.id !== challenge.id) setReviewCompleted(false);
     setTeams((previousTeams) =>
-      previousTeams.map((team, index) => (index === activeTeamIndex ? { ...team, challenge } : team)),
+      previousTeams.map((team, index) => index === activeTeamIndex ? (team.challenge && team.challenge.id !== challenge.id ? { ...team, challenge, organism: undefined, canvas: createEmptyCanvas(), pitchTitle: "", pitchSummary: "", votes: 0 } : { ...team, challenge }) : team),
     );
   };
 

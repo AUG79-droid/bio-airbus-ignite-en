@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, RotateCw, Sparkles } from "lucide-react";
 import { useBioLab } from "@/contexts/BioLabContext";
 import { CHALLENGES } from "@/data/biolab-data";
+import { CLIMATE_CHALLENGES } from "@/data/climate-challenges";
 
 interface ChallengeRouletteProps {
   onNext: () => void;
@@ -13,13 +14,21 @@ const CHALLENGE_CODES = ["STR", "AERO", "OPS", "ACOU", "MAT", "LOG", "NDT", "AIR
 
 export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteProps) {
   const { setTeamChallenge, activeTeam } = useBioLab();
-  const savedIndex = CHALLENGES.findIndex((challenge) => challenge.id === activeTeam?.challenge?.id);
+  const [mode, setMode] = useState<"general" | "climate">(() => CLIMATE_CHALLENGES.some(c => c.id === activeTeam?.challenge?.id) ? "climate" : "general");
+  const pool = mode === "climate" ? CLIMATE_CHALLENGES : CHALLENGES;
+  const codes = mode === "climate" ? ["HEAT", "DUST", "HAIL"] : CHALLENGE_CODES;
+  const angleStep = 360 / pool.length;
+  const savedIndex = pool.findIndex((challenge) => challenge.id === activeTeam?.challenge?.id);
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(savedIndex >= 0 ? savedIndex : 0);
   const [selected, setSelected] = useState(savedIndex >= 0);
-  const [rotation, setRotation] = useState(-(savedIndex >= 0 ? savedIndex : 0) * 45);
+  const [rotation, setRotation] = useState(-(savedIndex >= 0 ? savedIndex : 0) * angleStep);
   const timerRef = useRef<number | null>(null);
-  const challenge = CHALLENGES[currentIndex];
+  const challenge = pool[currentIndex];
+  const chooseMode = (next: "general" | "climate") => {
+    if (isSpinning || next === mode) return;
+    setMode(next); setCurrentIndex(0); setRotation(0); setSelected(false);
+  };
 
   useEffect(() => () => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -35,8 +44,8 @@ export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteP
 
     const tick = () => {
       completedSteps += 1;
-      setCurrentIndex((index) => (index + 1) % CHALLENGES.length);
-      setRotation((angle) => angle - 45);
+      setCurrentIndex((index) => (index + 1) % pool.length);
+      setRotation((angle) => angle - angleStep);
 
       if (completedSteps >= totalSteps) {
         setIsSpinning(false);
@@ -49,7 +58,7 @@ export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteP
     };
 
     timerRef.current = window.setTimeout(tick, 70);
-  }, [isSpinning]);
+  }, [isSpinning, pool, angleStep]);
 
   const handleConfirm = () => {
     setTeamChallenge(challenge);
@@ -75,17 +84,24 @@ export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteP
           )}
         </motion.header>
 
+        <section className="max-w-5xl mx-auto biolab-card mb-6" aria-label="Workshop mode">
+          <div className="flex flex-wrap gap-3">
+            <button type="button" aria-pressed={mode === "general"} disabled={isSpinning} onClick={() => chooseMode("general")} className={mode === "general" ? "biolab-btn-primary" : "biolab-btn-ghost"}>General innovation (8 challenges)</button>
+            <button type="button" aria-pressed={mode === "climate"} disabled={isSpinning} onClick={() => chooseMode("climate")} className={mode === "climate" ? "biolab-btn-primary" : "biolab-btn-ghost"}>Climate Resilience Lab (3 challenges)</button>
+          </div>
+          {mode === "climate" && <><p className="text-sm text-muted-foreground mt-4 leading-6">Hypothetical adaptation exercise for future physical hazards: heat, dust and hail. Not a technical approval or performance simulation. Air density and other hazards require separate analysis.</p><div className="flex flex-wrap gap-2 mt-3">{pool.map((item,i)=><button key={item.id} type="button" disabled={isSpinning} aria-pressed={selected && currentIndex===i} className="biolab-btn-ghost" onClick={()=>{setCurrentIndex(i);setRotation(-i*angleStep);setSelected(true);}}>{item.title}</button>)}</div></>}
+        </section>
         <div className="max-w-5xl mx-auto grid lg:grid-cols-[390px_1fr] gap-7 items-stretch">
           <motion.section initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} className="biolab-card-dark biolab-wheel-panel">
             <div className="biolab-wheel-marker" aria-hidden="true" />
-            <div className="biolab-wheel" aria-label={`Current challenge: ${challenge.title}`}>
+            <div className="biolab-wheel" style={mode === "climate" ? { background: "conic-gradient(from -60deg, #143c51 0deg 120deg, #25576a 120deg 240deg, #1a4558 240deg 360deg)" } : undefined} aria-label={`Current challenge: ${challenge.title}`}>
               <motion.div
                 className="absolute inset-0"
                 animate={{ rotate: rotation }}
                 transition={{ duration: isSpinning ? 0.12 : 0.5, ease: isSpinning ? "linear" : "easeOut" }}
               >
-                {CHALLENGES.map((item, index) => {
-                  const angle = index * 45;
+                {pool.map((item, index) => {
+                  const angle = index * angleStep;
                   const isCurrent = index === currentIndex;
                   return (
                     <div
@@ -93,7 +109,7 @@ export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteP
                       className={`biolab-wheel-node ${isCurrent ? "is-current" : ""}`}
                       style={{ transform: `rotate(${angle}deg) translateY(-132px) rotate(${-angle}deg)` }}
                     >
-                      <span style={{ transform: `rotate(${currentIndex * 45}deg)` }}>{CHALLENGE_CODES[index]}</span>
+                      <span style={{ transform: `rotate(${currentIndex * angleStep}deg)` }}>{codes[index]}</span>
                     </div>
                   );
                 })}
@@ -101,7 +117,7 @@ export default function ChallengeRoulette({ onNext, onBack }: ChallengeRouletteP
               <div className="biolab-wheel-core">
                 <Sparkles className="h-5 w-5" />
                 <span>REF-{challenge.id.toUpperCase()}</span>
-                <strong>{CHALLENGE_CODES[currentIndex]}</strong>
+                <strong>{codes[currentIndex]}</strong>
               </div>
             </div>
 

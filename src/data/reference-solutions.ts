@@ -1,3 +1,4 @@
+import { climateReferenceSolutions } from "./climate-challenges";
 import type { CanvasData } from "./biolab-data";
 /** Learning references, not Airbus-approved engineering solutions or proven performance claims. */
 export type ReferenceSolution = {
@@ -5,6 +6,7 @@ export type ReferenceSolution = {
   answer: CanvasData; check: string[];
 };
 export const referenceSolutions: Record<string, ReferenceSolution> = {
+  ...climateReferenceSolutions,
  c1:{
   recommendedModel:"Bird bones",
   mechanism:"Internal cavities and reinforcement can distribute loads while reducing the material volume.",

@@ -14,13 +14,13 @@ import ResultsScreen from "@/components/biolab/ResultsScreen";
 import { AnimatePresence, motion } from "framer-motion";
 
 function BioLabApp() {
-  const { currentScreen, nextScreen, prevScreen, resetSession } = useBioLab();
+  const { currentScreen, nextScreen, prevScreen, resetSession, activeTeam } = useBioLab();
 
   const screens = [
     <WelcomeScreen onNext={nextScreen} />,
     <HowItWorksScreen onNext={nextScreen} onBack={prevScreen} />,
     <TeamsScreen onNext={nextScreen} onBack={prevScreen} />,
-    <ChallengeRoulette onNext={nextScreen} onBack={prevScreen} />,
+    <ChallengeRoulette key={activeTeam?.id ?? "none"} onNext={nextScreen} onBack={prevScreen} />,
     <NatureLibrary onNext={nextScreen} onBack={prevScreen} />,
     <MatchingScreen onNext={nextScreen} onBack={prevScreen} />,
     <BioCanvasScreen onNext={nextScreen} onBack={prevScreen} />,

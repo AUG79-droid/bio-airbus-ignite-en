@@ -1,3 +1,4 @@
+import { climateSources } from "@/data/climate-challenges";
 import { useState } from "react";
 import type { TeamData } from "@/data/biolab-data";
 import { referenceLabels, referenceSolutions } from "@/data/reference-solutions";
@@ -32,7 +33,8 @@ export default function ReferenceComparison({teams}:Props) {
         {teams.map((team,index)=>{
           const ref=team.challenge?referenceSolutions[team.challenge.id]:undefined;
           const ticks=assessments[team.id]??[false,false,false,false];
-          const count=ticks.filter(Boolean).length;
+          const total = ref?.check.length ?? 4;
+          const count = ticks.slice(0, total).filter(Boolean).length;
           return (
             <details key={team.id} className="rounded-2xl border border-border bg-background/70 p-4 md:p-6"
               open={expanded[team.id]??(index===0)}>
@@ -62,6 +64,7 @@ export default function ReferenceComparison({teams}:Props) {
                     </p>}
                   <p className="text-base leading-7 text-foreground mb-3"><strong>Why this reference makes sense:</strong> {ref.explanation}</p>
                   <p className="text-base leading-7 text-foreground mb-6"><strong>Important limitations:</strong> {ref.caution}</p>
+                  {team.challenge && climateSources[team.challenge.id] && <p className="mb-5 text-sm text-muted-foreground"><a className="underline" href={climateSources[team.challenge.id]} target="_blank" rel="noreferrer">Scientific reference for the biological mechanism (does not validate aerospace application)</a></p>}
                   <div className="space-y-4">
                     {referenceLabels.map(({key,label})=>(
                       <div key={key} className="rounded-xl border border-border overflow-hidden">
@@ -95,10 +98,10 @@ export default function ReferenceComparison({teams}:Props) {
                       ))}
                     </div>
                     <div className="mt-5 border-t border-border pt-4">
-                      <p className="text-lg font-semibold">{count}/4 criteria marked by the team</p>
+                      <p className="text-lg font-semibold">{count}/{total} criteria marked by the team</p>
                       <p className="text-base text-muted-foreground leading-7 mt-1">
-                        {count===4?"All four criteria are marked. Check the evidence: this does not represent technical approval.":
-                          `${4-count} criteria remain unchecked. Revisit your canvas or identify missing information and tests.`}
+                        {count === total?"All criteria are marked. Check the evidence: this does not represent technical approval.":
+                          `${total - count} criteria remain unchecked. Revisit your canvas or identify missing information and tests.`}
                       </p>
                     </div>
                   </div>
