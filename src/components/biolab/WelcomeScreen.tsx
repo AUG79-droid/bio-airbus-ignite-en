@@ -1,4 +1,4 @@
-import { setPreferredTrack } from "@/components/biolab/PilotAssessment";
+import { setPreferredTrack, usesHubAssessment } from "@/components/biolab/PilotAssessment";
 import { motion } from "framer-motion";
 interface WelcomeScreenProps {
   onNext: () => void;
@@ -102,7 +102,7 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
             <div className="rounded-xl border border-white/20 p-4"><h3 className="text-xl font-bold">Climate Adaptation</h3><p className="mt-2 mb-4 text-slate-200">Identify future physical vulnerabilities and formulate testable adaptation ideas. 7 challenges.</p><button className="biolab-btn-accent" onClick={()=>{setPreferredTrack("climate");onNext();}}>Start climate adaptation</button></div>
             <div className="rounded-xl border border-white/20 p-4"><h3 className="text-xl font-bold">Strategic Resilience</h3><p className="mt-2 mb-4 text-slate-200">Explore dependencies, recovery, coordination and longevity. 4 challenges.</p><button className="biolab-btn-accent" onClick={()=>{setPreferredTrack("resilience");onNext();}}>Start strategic resilience</button></div>
           </div>
-          <p className="text-sm text-slate-300 mt-3">Indicative duration: 25–40 min per challenge. Initial and final assessments; voluntary export of unnamed learning data.</p>
+          <p className="text-sm text-slate-300 mt-3">{usesHubAssessment()?"Indicative duration: 25–40 min per challenge. Pilot assessments are in the Sustainability Navigator tab.":"Indicative duration: 25–40 min per challenge. Initial and final assessments; voluntary export of unnamed learning data."}</p>
         </section>
         <div className="text-center mb-12">
           <p className="text-sm max-w-2xl mx-auto mb-6" style={{ color: "hsl(210, 15%, 58%)" }}>

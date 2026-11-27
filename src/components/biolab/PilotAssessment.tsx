@@ -130,6 +130,8 @@ const bank:Record<PilotTrack,Record<Phase,Question[]>>={
   }
 };
 const PREF="biolab-pilot-track-v1";
+// Optional common Hub assessment handoff, not an access-control or verified completion signal.
+export function usesHubAssessment(search=window.location.search){return new URLSearchParams(search).get("hubAssessment")==="sn-pilot-v1";}
 const key=(id:string,track:PilotTrack)=>"biolab-pilot-v1:"+id+":"+track;
 type RecordData={pre?:number[];post?:number[];utility?:number;clarity?:number;transfer?:number;challengeId?:string};
 function read(id:string,track:PilotTrack):RecordData {try{return JSON.parse(localStorage.getItem(key(id,track))||"{}")||{};}catch{return {};}}

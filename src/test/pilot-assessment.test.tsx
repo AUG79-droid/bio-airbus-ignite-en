@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, afterEach, describe, it, expect } from "vitest";
-import { PilotAssessment, hasBaseline, preferredTrack, setPreferredTrack } from "@/components/biolab/PilotAssessment";
+import { PilotAssessment, hasBaseline, preferredTrack, setPreferredTrack, usesHubAssessment } from "@/components/biolab/PilotAssessment";
 const saveLabel="Save assessment";
 const fill=(indices:number[])=>{const fields=screen.getAllByRole("group").filter(f=>f.querySelector('input[type="radio"]'));expect(fields).toHaveLength(4);fields.forEach((f,i)=>fireEvent.click(f.querySelectorAll('input[type="radio"]')[indices[i]]));};
 describe("Independent pilot assessment",()=>{
@@ -18,3 +18,4 @@ describe("Independent pilot assessment",()=>{
  render(<PilotAssessment teamId="one" track="climate" phase="post" challengeId="c9"/>);fill([1,0,2,1]);expect(screen.getByRole("button",{name:saveLabel})).toBeDisabled();screen.getAllByRole("combobox").forEach(c=>fireEvent.change(c,{target:{value:"4"}}));fireEvent.click(screen.getByRole("button",{name:saveLabel}));expect(screen.getByText(/3\/4.*4\/4.*25 pp/)).toBeInTheDocument();expect(screen.getByRole("button",{name:/JSON/i})).toBeInTheDocument();
  });
 });
+it("recognises only the explicit versioned Hub handoff without changing standalone learning",()=>{expect(usesHubAssessment("?hubAssessment=sn-pilot-v1")).toBe(true);expect(usesHubAssessment("?hubAssessment=other")).toBe(false);expect(usesHubAssessment("")).toBe(false);});
