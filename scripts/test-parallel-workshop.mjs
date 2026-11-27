@@ -49,6 +49,7 @@ try{
  await host.getByTestId("host-guide").waitFor();
  await host.getByTestId("guide-next").click();
  await host.getByTestId("role-help").waitFor();
+ await host.getByTestId("meeting-preparation").waitFor();
  assert.match(await host.getByTestId("host").innerText(),/Crear un taller nuevo|Create a new workshop/);
  assert.equal(await host.getByTestId("saved-workshop").count(),0);
  await host.getByTestId("join-entry").click();
@@ -60,6 +61,9 @@ try{
  await host.getByTestId("count").selectOption("3");
  await host.getByTestId("spin").click();
  const code=await host.getByTestId("session-code").inputValue();
+ await host.getByTestId("go-to-collection").click();
+ assert.equal(await host.locator("#collect-proposals").count(),1);
+ assert.equal(await host.locator('label[for="proposal-files"]').isVisible(),true);
  const challenge=await host.locator("h1").first().innerText();
  const links=await Promise.all(players.map((_,i)=>host.getByTestId("team-link-"+(i+1)).getAttribute("href")));
  assert.equal(new Set(links).size,3);
