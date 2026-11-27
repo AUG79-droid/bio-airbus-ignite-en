@@ -19,3 +19,5 @@ describe("Independent pilot assessment",()=>{
  });
 });
 it("recognises only the explicit versioned Hub handoff without changing standalone learning",()=>{expect(usesHubAssessment("?hubAssessment=sn-pilot-v1")).toBe(true);expect(usesHubAssessment("?hubAssessment=other")).toBe(false);expect(usesHubAssessment("")).toBe(false);});
+
+it("supports the general innovation baseline independently from the climate and resilience tracks",()=>{render(<PilotAssessment teamId="general-one" track="general" phase="pre"/>);fill([0,2,1,0]);fireEvent.click(screen.getByRole("button",{name:saveLabel}));expect(hasBaseline("general-one","general")).toBe(true);expect(hasBaseline("general-one","climate")).toBe(false);});
