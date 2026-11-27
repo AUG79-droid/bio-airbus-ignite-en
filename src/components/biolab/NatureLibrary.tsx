@@ -118,7 +118,7 @@ export default function NatureLibrary({ onNext, onBack }: NatureLibraryProps) {
                     loading="lazy"
                   />
                 </div>
-                {photoCredits[org.id] && <p className="px-5 pt-2 text-xs text-muted-foreground leading-5">Photo: <a className="underline" href={photoCredits[org.id].source??photoCredits[org.id].page} target="_blank" rel="noreferrer">{photoCredits[org.id].author}</a> · <a className="underline" href={photoCredits[org.id].licenseUrl} target="_blank" rel="noreferrer">{photoCredits[org.id].license}</a> · <a className="underline" href={photoCredits[org.id].page} target="_blank" rel="noreferrer">Original</a> · display crop</p>
+                {photoCredits[org.id] && <p className="px-5 pt-2 text-xs text-muted-foreground leading-5">Photo: <a className="underline" href={photoCredits[org.id].source??photoCredits[org.id].page} target="_blank" rel="noreferrer">{photoCredits[org.id].author}</a> · <a className="underline" href={photoCredits[org.id].licenseUrl} target="_blank" rel="noreferrer">{photoCredits[org.id].license}</a> · <a className="underline" href={photoCredits[org.id].page} target="_blank" rel="noreferrer">Original</a> · display crop</p>}
 
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3 mb-3">
