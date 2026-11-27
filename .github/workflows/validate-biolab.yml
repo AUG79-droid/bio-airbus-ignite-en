@@ -21,3 +21,10 @@ jobs:
         run: npm test
       - name: Build production site
         run: npm run build
+
+      - name: Install browser for workshop integration test
+        run: npx playwright install --with-deps chromium
+      - name: Test three independent team journeys in real browser
+        run: node scripts/test-parallel-workshop.mjs
+        env:
+          BIOLAB_LANG: en
