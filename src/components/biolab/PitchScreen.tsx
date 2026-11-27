@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
 import { isCanvasEntryReady, isObviousFillerText, isPitchTitleReady, isPitchSummaryReady } from "@/data/biolab-data";
@@ -9,6 +10,8 @@ interface PitchScreenProps {
 
 export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
   const { activeTeam, activeTeamIndex, teams, updatePitch, setActiveTeam, isPitchComplete } = useBioLab();
+  const [pendingDraft,setPendingDraft]=useState<{teamId:string; text:string}|null>(null);
+  const [draftStatus,setDraftStatus]=useState<{teamId:string; text:string}|null>(null);
   if (!activeTeam) return null;
 
   const challenge = activeTeam.challenge;
@@ -38,19 +41,33 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
     else onNext();
   };
 
-  const suggestedPitch = [
-    canvas.problem && `We are addressing ${canvas.problem}`,
-    organism?.name && organism?.principle && `We drew inspiration from ${organism.name}, which performs this function through ${organism.principle.toLowerCase()}`,
-    canvas.solution && `We propose ${canvas.solution}`,
-    canvas.benefit && `This would enable ${canvas.benefit}`,
-    canvas.implementation && `The first step would be ${canvas.implementation}`,
-  ]
-    .filter(Boolean)
-    .join(". ");
-
-  const draftPitch = () => {
-    if (!activeTeam.pitchSummary.trim()) updatePitch(activeTeam.pitchTitle, suggestedPitch);
+  const draftFields = [
+    ["problem","Problem"],
+    ["organism","Natural inspiration"],
+    ["principle","Transferred principle"],
+    ["solution","Proposed solution"],
+    ["benefit","Hypothetical benefit"],
+    ["implementation","First test"],
+  ] as const;
+  const writeDraft = (text:string) => {
+    updatePitch(activeTeam.pitchTitle,text);
+    setPendingDraft(null);
+    setDraftStatus({teamId:activeTeam.id,text:"Draft created in the pitch field. Review, edit and shorten it to about 60 seconds."});
   };
+  const draftPitch = () => {
+    setDraftStatus(null);
+    const missing=draftFields.filter(([field])=>!isCanvasEntryReady(field,canvas[field]));
+    if(missing.length){
+      setPendingDraft(null);
+      setDraftStatus({teamId:activeTeam.id,text:"Before creating a draft, return to the canvas and complete or correct: "+missing.map(([,label])=>label).join(", ")+"."});
+      return;
+    }
+    const text=draftFields.map(([field,label])=>label+": "+canvas[field].trim()).join("\n\n");
+    if(activeTeam.pitchSummary.trim()){
+      setPendingDraft({teamId:activeTeam.id,text});
+    }else writeDraft(text);
+  };
+
   return (
     <div className="min-h-screen flex flex-col py-20 biolab-grid-pattern">
       <div className="biolab-container">
@@ -192,19 +209,20 @@ export default function PitchScreen({ onNext, onBack }: PitchScreenProps) {
               </div>
               <textarea
                 value={activeTeam.pitchSummary}
-                onChange={(e) => updatePitch(activeTeam.pitchTitle, e.target.value)}
+                onChange={(e) => {updatePitch(activeTeam.pitchTitle, e.target.value);setPendingDraft(null);setDraftStatus(null);}}
                 placeholder="In your own words, explain the problem, the natural mechanism, your solution, the expected benefit and how you would test the idea."
                 rows={8}
                 className="biolab-input resize-y text-base leading-relaxed"
               />
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                <button type="button" className="biolab-btn-ghost border border-primary/25" disabled={Boolean(activeTeam.pitchSummary.trim())}
+                <button type="button" className="biolab-btn-primary" data-testid="create-pitch-draft"
                   onClick={draftPitch}>Create an editable draft from my six answers</button>
                 <p className="text-sm text-muted-foreground">
-                  This button only assembles <strong>what your team has already written</strong>.
-                  It does not replace technical review.
+                  Copies your six canvas answers into the pitch field. If it already contains text, you will be asked before replacing it. Review and shorten the draft: it is not a technical assessment.
                 </p>
               </div>
+              {pendingDraft?.teamId===activeTeam.id&&<div className="mt-4 rounded-xl border border-amber-400 bg-amber-50 text-amber-950 p-4" data-testid="draft-confirm"><p className="font-semibold">Your pitch already contains text. Replace it with a draft of your six answers?</p><div className="flex flex-wrap gap-3 mt-3"><button type="button" data-testid="replace-pitch-draft" className="biolab-btn-accent" onClick={()=>writeDraft(pendingDraft.text)}>Replace text with draft</button><button type="button" data-testid="cancel-pitch-draft" className="biolab-btn-ghost" onClick={()=>{setPendingDraft(null);setDraftStatus({teamId:activeTeam.id,text:"Your original text has been kept."});}}>Keep my text</button></div></div>}
+              {draftStatus?.teamId===activeTeam.id&&<p role="status" data-testid="draft-status" className="mt-3 rounded-lg border bg-muted/60 p-3 text-sm font-medium">{draftStatus.text}</p>}
             </motion.div>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="biolab-card-dark py-5 px-5">

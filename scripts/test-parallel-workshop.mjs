@@ -89,6 +89,19 @@ try{
   for(let j=0;j<6;j++)await textareas.nth(j).fill("Team "+(i+1)+" section "+(j+1)+": compare the proposed natural mechanism against a defined baseline, including operating constraints and measurable verification.");
   await canvas.getByRole("button",{name:es?/Ya he redactado los seis apartados/:/I have written all six sections/}).click();
   const pitch=p.getByTestId("stage-7");
+  await pitch.getByTestId("create-pitch-draft").click();
+  const generated=await pitch.locator("textarea").inputValue();
+  for(let j=1;j<=6;j++)assert.ok(generated.includes("Team "+(i+1)+" section "+j+":"));
+  await pitch.getByTestId("draft-status").waitFor();
+  const existing="Existing text that must not be lost.";
+  await pitch.locator("textarea").fill(existing);
+  await pitch.getByTestId("create-pitch-draft").click();
+  await pitch.getByTestId("cancel-pitch-draft").click();
+  assert.equal(await pitch.locator("textarea").inputValue(),existing);
+  await pitch.getByTestId("create-pitch-draft").click();
+  await pitch.getByTestId("replace-pitch-draft").click();
+  assert.equal(await pitch.locator("textarea").inputValue(),generated);
+
   await pitch.locator('input[type=text]').fill("Independent proposal team "+(i+1));
   await pitch.locator("textarea").fill("This team proposes a distinct bio-inspired design for the shared challenge. We would compare it with a conventional baseline at equivalent conditions and test safety, performance and uncertainty.");
   await pitch.getByRole("button",{name:es?/Ir al paso 7: revisar propuestas/:/Go to step 7: review proposals/}).click();
