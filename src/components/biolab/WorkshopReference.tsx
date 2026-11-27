@@ -23,7 +23,7 @@ export default function WorkshopReference({session,proposals}:{session:Session;p
   </section>
   <section className="rounded-xl border p-4 md:p-5">
     <h3 className="font-bold text-xl mb-2">Compare each team against the reference</h3>
-    <p className="text-sm leading-6 mb-4">Select a team. Its original answers appear on the left and the six model answers on the right. Review differences and possible improvements without deciding a winner.</p>
+    <p className="text-sm leading-6 mb-4">Select a team. Its original answers appear on the left and the six model answers on the right. Review differences and possible improvements.</p>
     <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label="Team to compare">{proposals.map(p=><button type="button" key={p.slot} data-testid={"compare-team-"+p.slot} aria-pressed={selected.slot===p.slot} className={selected.slot===p.slot?"biolab-btn-primary":"biolab-btn-ghost border border-border"} onClick={()=>setSlot(p.slot)}>Team {p.slot}</button>)}</div>
     <div className="rounded-xl border bg-muted/40 p-4 mb-4 min-w-0"><h4 className="font-bold text-base break-words" style={{overflowWrap:"anywhere"}} data-testid="selected-proposal">{selected.pitchTitle}</h4><p className="text-sm leading-6 whitespace-pre-wrap break-words mt-2" style={{overflowWrap:"anywhere"}}>{selected.pitchSummary}</p><p className="text-sm mt-3"><strong>Selected model:</strong> {chosen?.name} · {selected.language.toUpperCase()}</p></div>
     <p className="text-sm leading-6 mb-4">A different model can be valid if the causal mechanism and a testable solution are explained. Matching the model's name does not guarantee a good answer.</p>

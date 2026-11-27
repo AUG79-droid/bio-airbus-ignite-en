@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useLayoutEffect } from "react";
 import { setPreferredTrack, preferredTrack } from "@/components/biolab/PilotAssessment";
 import { challengeTrack, type Track } from "@/data/resilience-expansion";
 import Workshop from "@/components/biolab/Workshop";
@@ -19,6 +19,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 function BioLabApp() {
   const { currentScreen, nextScreen, prevScreen, resetSession, activeTeam, teams, setScreen } = useBioLab();
+  useLayoutEffect(()=>{window.scrollTo({top:0,left:0,behavior:"instant"});},[currentScreen]);
   const [landing,setLanding]=useState(true);
   const startTrack=(track:Track,participation:"single"|"competition")=>{
     if(participation==="competition"){window.location.assign(import.meta.env.BASE_URL+"?workshop=1&track="+track);return;}
@@ -53,6 +54,7 @@ function BioLabApp() {
       <AnimatePresence mode="wait">
         <motion.div
           key={currentScreen}
+          onAnimationStart={()=>window.scrollTo({top:0,left:0,behavior:"instant"})}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

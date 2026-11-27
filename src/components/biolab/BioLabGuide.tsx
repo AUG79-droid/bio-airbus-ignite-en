@@ -67,7 +67,7 @@ export default function BioLabGuide({stageOverride,competition=false}:{stageOver
 
   const guide = useMemo(() => {
     if(competition&&currentScreen===1)return {title:"Guide · How competition works",instruction:"Read the four biomimicry rules and worked example before starting. The challenge is fixed for all teams.",tip:"Choose by function and mechanism, not shape. You do not have to wait for other teams."};
-    if(competition&&currentScreen===3)return {title:"Common challenge · initial assessment",instruction:"All teams have exactly the same challenge. Complete the initial assessment and explore the nature library.",tip:"You cannot spin again. Your proposal must address the common challenge."};
+    if(competition&&currentScreen===3)return {title:"Common challenge · start research",instruction:"All teams have exactly the same challenge. Explore the nature library and look for a suitable mechanism.",tip:"You cannot spin again. Your proposal must address the common challenge."};
     if(competition&&currentScreen===8)return {title:"Submit proposal",instruction:"Lock and download your JSON proposal. Share it with the workshop host when ready.",tip:"Wait for all proposals to be collected before viewing reference answers."};
     if (currentScreen === 6) return canvasSteps[Math.min(Math.max(guideSubstep, 0), 5)];
     const base = screenSteps[Math.min(Math.max(currentScreen, 0), screenSteps.length - 1)];

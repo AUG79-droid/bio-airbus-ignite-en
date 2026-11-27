@@ -5,7 +5,7 @@ import { useBioLab } from "@/contexts/BioLabContext";
 import { CHALLENGES } from "@/data/biolab-data";
 import { CLIMATE_CHALLENGES } from "@/data/climate-challenges";
 import { STRATEGIC_CHALLENGES, challengeTrack, type Track } from "@/data/resilience-expansion";
-import { PilotAssessment, preferredTrack, hasBaseline } from "@/components/biolab/PilotAssessment";
+import { preferredTrack } from "@/components/biolab/PilotAssessment";
 
 interface ChallengeRouletteProps {
   onNext: () => void;
@@ -64,9 +64,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
   }, [isSpinning, pool, angleStep]);
 
   const handleConfirm = () => {
-    if (activeTeam && !hasBaseline(activeTeam.id, mode, challenge.id)) {window.alert("Complete the initial assessment first.");return;}
     if (activeTeam?.challenge && activeTeam.challenge.id !== challenge.id && !window.confirm("Changing the challenge clears the active team's model, canvas and pitch. Continue?")) return;
-    if (activeTeam && !hasBaseline(activeTeam.id, mode, challenge.id)) return;
     setTeamChallenge(challenge);
     onNext();
   };
@@ -98,7 +96,6 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
           </div>}
           {mode !== "general" && <><p className="text-sm text-muted-foreground mt-4 leading-6">{mode === "climate" ? "Learn to connect future physical hazards with product and support vulnerabilities. Heat, radiation, dust, hail, moisture and cold. No aircraft performance calculations or full adaptation coverage." : "Learn how Procurement, Engineering, Operations and Maintenance can reduce dependencies, preserve functions and support recovery. Results are learning hypotheses."}</p><div className="flex flex-wrap gap-2 mt-3">{pool.map((item,i)=><button key={item.id} type="button" disabled={isSpinning} aria-pressed={selected && currentIndex===i} className="biolab-btn-ghost" onClick={()=>{setCurrentIndex(i);setRotation(-i*angleStep);setSelected(true);}}>{item.title}</button>)}</div></>}
         </section>
-        {activeTeam && <PilotAssessment key={activeTeam.id+mode} teamId={activeTeam.id} track={mode} phase="pre" />}
         <div className="max-w-5xl mx-auto grid lg:grid-cols-[390px_1fr] gap-7 items-stretch">
           <motion.section initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} className="biolab-card-dark biolab-wheel-panel">
             <div className="biolab-wheel-marker" aria-hidden="true" />
