@@ -109,12 +109,12 @@ export const expansionReferences: Record<string,ReferenceSolution> = {
     "caution": "Humidity is not the same as rain or condensation; response may be slow, irreversible or temperature-dependent.",
     "explanation": "Test equipment experiences hypothetical changing humidity and drying cycles. Explore an experimental passive exposure indicator without replacing certified sensors.",
     "answer": {
-      "problem": "Compare humidity-cycle detection against an instrumented reference.",
+      "problem": "Detect humidity changes in a non-critical experimental enclosure before prolonged exposure can degrade its materials, without replacing the reference sensor.",
       "organism": "Scale layers change dimensions differently with moisture, producing movement.",
-      "principle": "Differential hygroscopic response",
-      "solution": "Explore a dimensional-change indicator in the laboratory, not as a safety system.",
-      "benefit": "Measure response, repeatability, hysteresis and false indications under equivalent cycles.",
-      "implementation": "Materials and Instrumentation: compare with a reference sensor and record temperature and ageing."
+      "principle": "Bond two layers with different hygroscopic expansion so that moisture absorption or loss produces observable curvature.",
+      "solution": "Make an experimental strip of two layers with different humidity sensitivity, fixed at one end. The free end moves a marker along a visual exposure scale. Calibrate it against a hygrometer in a test chamber; do not use it as a safety alarm or install it on an aircraft.",
+      "benefit": "Hypothesis: obtain a visual exposure signal without a dedicated power supply. Measure response time, repeatability, hysteresis and false indications; check whether temperature, ageing or condensation alter the signal.",
+      "implementation": "Materials and Instrumentation: expose several strips to controlled humidity and drying cycles in a chamber, record curvature and reference humidity at different temperatures, and repeat after ageing. Define tolerance and maximum response time beforehand; reject the concept if it fails."
     },
     "check": [
       "Does it define the hazard or disruption, exposure, vulnerability and consequence?",
