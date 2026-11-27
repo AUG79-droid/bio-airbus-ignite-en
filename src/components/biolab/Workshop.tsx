@@ -1,3 +1,4 @@
+import ResetBioLabButton from "./ResetBioLabButton";
 import {openPdfReport,type Report} from "@/data/report-export";
 import {referenceLabels} from "@/data/reference-solutions";
 import WorkshopReference from "./WorkshopReference";
@@ -26,7 +27,7 @@ const root=()=>import.meta.env.BASE_URL;
 const room=(code:string,slot?:number)=>root()+"?workshop=1&code="+encodeURIComponent(code)+(slot?"&team="+slot:"");
 function read<T>(key:string,fallback:T):T{try{return JSON.parse(localStorage.getItem(key)??"null")??fallback;}catch{return fallback;}}
 function download(name:string,data:unknown){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-function Shell({children}:{children:React.ReactNode}){return <main className="min-h-screen biolab-grid-pattern py-8"><div className="biolab-container"><div className="flex items-center justify-between flex-wrap gap-3 mb-6"><a href={root()} className="biolab-btn-ghost">← BioLab</a><span className="biolab-phase"> "Team competition · independent devices" </span></div></div>{children}<p className="text-sm text-muted-foreground mt-8 max-w-5xl mx-auto px-5">{notice}</p></main>}
+function Shell({children}:{children:React.ReactNode}){return <main className="min-h-screen biolab-grid-pattern py-8"><div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b mb-5"><div className="biolab-container"><div className="flex items-center justify-between flex-wrap gap-3 py-2"><a href={root()} className="biolab-btn-ghost">← BioLab</a><span className="biolab-phase"> "Team competition · independent devices" </span><ResetBioLabButton/></div></div></div>{children}<p className="text-sm text-muted-foreground mt-8 max-w-5xl mx-auto px-5">{notice}</p></main>}
 type HostState={code:string;proposals:Proposal[]};
 function loadHost(track:Track):HostState|null{const previous=read<HostState|null>(hostKey,null);const h=read<HostState|null>(hostKey+":"+track,null)??(previous&&parseCode(previous.code)?.track===track?previous:null),s=h&&typeof h.code==="string"?parseCode(h.code):null;if(!h||!s||s.track!==track)return null;let proposals:Proposal[]=[];for(const p of Array.isArray(h.proposals)?h.proposals:[]){const v=validateProposal(p,s);if(v&&!proposals.some(x=>x.slot===v.slot))proposals=addProposal(proposals,v,s);}return {code:codeFor(s),proposals};}
 function clearWorkshop(track:Track){
