@@ -23,7 +23,7 @@ export const CLIMATE_CHALLENGES: Challenge[] = [
     "title": "Limit hail-impact damage",
     "area": "Materials Engineering & Durability",
     "description": "Under hypothetical future hail exposure, explore layered architecture in a non-critical panel coupon. Do not extrapolate to aircraft storm resistance."
-  }
+  },
   ...EXTRA_CLIMATE,
 ];
 export const climateReferenceSolutions: Record<string, ReferenceSolution> = {
