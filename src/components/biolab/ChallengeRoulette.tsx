@@ -5,7 +5,7 @@ import { useBioLab } from "@/contexts/BioLabContext";
 import { CHALLENGES } from "@/data/biolab-data";
 import { CLIMATE_CHALLENGES } from "@/data/climate-challenges";
 import { STRATEGIC_CHALLENGES, challengeTrack, type Track } from "@/data/resilience-expansion";
-import { preferredTrack } from "@/components/biolab/PilotAssessment";
+import { preferredTrack, PilotAssessment, hasBaseline } from "@/components/biolab/PilotAssessment";
 
 interface ChallengeRouletteProps {
   onNext: () => void;
@@ -26,6 +26,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
   const [currentIndex, setCurrentIndex] = useState(savedIndex >= 0 ? savedIndex : 0);
   const [selected, setSelected] = useState(savedIndex >= 0);
   const [rotation, setRotation] = useState(-(savedIndex >= 0 ? savedIndex : 0) * angleStep);
+  const [,refreshAssessment]=useState(0);
   const timerRef = useRef<number | null>(null);
   const challenge = pool[currentIndex];
   const chooseMode = (next: Track) => {
@@ -64,6 +65,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
   }, [isSpinning, pool, angleStep]);
 
   const handleConfirm = () => {
+    if(activeTeam&&!hasBaseline(activeTeam.id,mode,challenge.id))return;
     if (activeTeam?.challenge && activeTeam.challenge.id !== challenge.id && !window.confirm("Changing the challenge clears the active team's model, canvas and pitch. Continue?")) return;
     setTeamChallenge(challenge);
     onNext();
@@ -168,7 +170,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
                     </span>
                     <div className="flex flex-wrap gap-3">
                       <button onClick={spin} className="biolab-btn-ghost"><RotateCw className="h-4 w-4" /> Spin again</button>
-                      <button onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button>
+                      {!activeTeam&&<button onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button>}
                     </div>
                   </div>
                 ) : (
@@ -182,6 +184,7 @@ export default function ChallengeRoulette({ onNext, onBack, lockedTrack }: Chall
           </AnimatePresence>
         </div>
 
+        {selected&&activeTeam&&<><PilotAssessment key={activeTeam.id+mode+challenge.id} teamId={activeTeam.id} track={mode} phase="pre" challengeId={challenge.id} onComplete={()=>refreshAssessment(n=>n+1)}/><div className="text-center"><button disabled={!hasBaseline(activeTeam.id,mode,challenge.id)} onClick={handleConfirm} className="biolab-btn-primary">Confirm challenge <ArrowRight className="h-4 w-4" /></button><p className="text-sm mt-2">Submit the four initial questions to continue. No minimum score is required.</p></div></>}
         <div className="flex justify-center mt-10">
           <button onClick={onBack} className="biolab-btn-ghost"><ArrowLeft className="h-4 w-4" /> Back</button>
         </div>

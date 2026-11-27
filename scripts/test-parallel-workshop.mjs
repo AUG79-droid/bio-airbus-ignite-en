@@ -75,8 +75,13 @@ try{
   await p.getByTestId("full-workshop-guide").waitFor();
   assert.ok(await p.getByText(es?"Cuatro reglas para una biomímesis rigurosa":/four rules/i).count());
   await p.getByTestId("guide-next").click();
+  assert.equal(await p.getByTestId("start-player").isEnabled(),false);
+  const initial=p.getByTestId("initial-assessment");
+  for(const field of await initial.locator("fieldset").all())await field.locator("input[type=radio]").first().check();
+  await initial.getByTestId("correct-assessment").click();
+  await initial.getByTestId("initial-score").waitFor();
+  assert.equal(await initial.locator('[data-testid^="feedback-"]').count(),4);
   assert.equal(await p.getByTestId("start-player").isEnabled(),true);
-  assert.equal(await p.locator("fieldset").count(),0);
   await p.getByTestId("start-player").click();
   const library=p.getByTestId("stage-4");
   await library.getByRole("button",{name:es?"Elegir este modelo":"Choose this model",exact:true}).nth(i).click();
@@ -127,6 +132,8 @@ try{
   await assessment.getByTestId("final-score").waitFor();
   assert.equal(await assessment.locator('[data-testid^="feedback-"]').count(),4);
   assert.equal(await assessment.getByTestId("assessment-pdf").isVisible(),true);
+  assert.match(await assessment.getByTestId("paired-summary").innerText(),/Inicial: 1\/4|Initial: 1\/4/);
+  assert.match(await assessment.getByTestId("paired-summary").innerText(),/Final: 1\/4/);
   assert.equal(await p.getByTestId("stage-7").count(),0);
   return {name:"team-"+(i+1)+".json",mimeType:"application/json",buffer:data};
  }));
