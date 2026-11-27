@@ -1,3 +1,4 @@
+import { setPreferredTrack } from "@/components/biolab/PilotAssessment";
 import { motion } from "framer-motion";
 interface WelcomeScreenProps {
   onNext: () => void;
@@ -94,6 +95,15 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
           ))}
         </div>
 
+        <section className="max-w-5xl mx-auto mb-8 rounded-2xl bg-slate-950/80 border border-white/20 p-5 text-white">
+          <h2 className="font-display text-2xl font-bold mb-2">Choose your learning objective</h2>
+          <p className="text-slate-200 mb-4">Work individually or in a team. Follow the instructions, solve one challenge and compare your proposal with a reference. No facilitator required.</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-xl border border-white/20 p-4"><h3 className="text-xl font-bold">Climate Adaptation</h3><p className="mt-2 mb-4 text-slate-200">Identify future physical vulnerabilities and formulate testable adaptation ideas. 7 challenges.</p><button className="biolab-btn-accent" onClick={()=>{setPreferredTrack("climate");onNext();}}>Start climate adaptation</button></div>
+            <div className="rounded-xl border border-white/20 p-4"><h3 className="text-xl font-bold">Strategic Resilience</h3><p className="mt-2 mb-4 text-slate-200">Explore dependencies, recovery, coordination and longevity. 4 challenges.</p><button className="biolab-btn-accent" onClick={()=>{setPreferredTrack("resilience");onNext();}}>Start strategic resilience</button></div>
+          </div>
+          <p className="text-sm text-slate-300 mt-3">Indicative duration: 25–40 min per challenge. Initial and final assessments; voluntary export of unnamed learning data.</p>
+        </section>
         <div className="text-center mb-12">
           <p className="text-sm max-w-2xl mx-auto mb-6" style={{ color: "hsl(210, 15%, 58%)" }}>
             Biomimicry studies how living systems perform functions and translates those strategies into human design. You will move from function to biological mechanism, design principle, application and validation.
@@ -102,7 +112,7 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={onNext}
+            onClick={()=>{setPreferredTrack("general");onNext();}}
             className="biolab-btn-accent text-lg px-14 py-5"
           >
             Enter the design studio
@@ -126,8 +136,8 @@ export default function WelcomeScreen({ onNext }: WelcomeScreenProps) {
         >
           {[
             { n: "6", label: "stages" },
-            { n: "8", label: "Airbus challenges" },
-            { n: "10", label: "natural models" },
+            { n: "19", label: "challenges" },
+            { n: "16", label: "natural models" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <span className="block text-2xl font-display font-bold" style={{ color: "hsl(45, 95%, 60%)" }}>{stat.n}</span>

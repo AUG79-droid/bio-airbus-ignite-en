@@ -1,3 +1,4 @@
+import { EXTRA_MODELS } from "@/data/resilience-expansion";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBioLab } from "@/contexts/BioLabContext";
@@ -18,7 +19,7 @@ export default function NatureLibrary({ onNext, onBack }: NatureLibraryProps) {
     setTeamOrganism(org);
   };
 
-  const selectedOrganism = ORGANISMS.find((org) => org.id === selectedId);
+  const selectedOrganism = [...ORGANISMS,...EXTRA_MODELS].find((org) => org.id === selectedId);
 
   return (
     <div className="min-h-screen flex flex-col py-20 biolab-grid-pattern">
@@ -96,7 +97,7 @@ export default function NatureLibrary({ onNext, onBack }: NatureLibraryProps) {
         )}
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
-          {ORGANISMS.map((org, i) => {
+          {[...ORGANISMS,...EXTRA_MODELS].map((org, i) => {
             const isExpanded = expandedId === org.id;
             const isSelected = selectedId === org.id;
             return (
