@@ -19,9 +19,16 @@ try{
  await host.evaluate(key=>localStorage.setItem(key,JSON.stringify({currentScreen:1,teams:[],activeTeamIndex:0,reviewCompleted:false})),"bio-airbus-ignite-en-v2");
  await host.reload();
  await host.getByTestId("resume-session").waitFor();
+ assert.equal(await host.getByTestId("competition-entry").count(),0);
+ await host.getByTestId("topic-climate").click();
+ await host.getByTestId("participation-choice").waitFor();
+ assert.match(await host.getByTestId("selected-topic").innerText(),/Adaptación climática|Climate Adaptation/i);
  await host.getByTestId("competition-entry").click();
+ await host.getByTestId("host-guide").waitFor();
+ await host.getByTestId("guide-next").click();
  await host.getByTestId("host").click();
- await host.getByTestId("track").selectOption("climate");
+ assert.match(await host.getByTestId("host-track").innerText(),/Adaptación climática|Climate adaptation/i);
+ assert.equal(await host.getByTestId("track").count(),0);
  await host.getByTestId("count").selectOption("3");
  await host.getByTestId("spin").click();
  const code=await host.getByTestId("session-code").inputValue();
